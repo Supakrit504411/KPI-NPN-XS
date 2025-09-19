@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Data Analytics Dashboard KPI PEA NAKHONPHANOM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        .blur-bg { backdrop-filter: blur(3px); }
+        .smooth-line { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 blur-bg flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl w-96 transform transition-all">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">🔐</div>
+                <h2 class="text-2xl font-bold text-gray-800">เข้าสู่ระบบ</h2>
+                <p class="text-gray-600">KPI(XS) PEA NAKHONPHANOM</p>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+                    <input type="text" id="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    เข้าสู่ระบบ
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-red-600 text-sm text-center hidden"></div>
+        </div>
+    </div>
+
+    <!-- Loading Alert -->
+    <div id="loadingAlert" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden" style="z-index: 9999;">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl text-center transform animate-pulse">
+            <div class="relative mb-6">
+                <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-2xl">🔐</div>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">กำลังเข้าสู่ระบบ...</h3>
+            <p class="text-gray-600 mb-4">ระบบกำลังตรวจสอบ PASSWORD</p>
+            <div class="flex justify-center space-x-1">
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="blur-bg opacity-40 transition-all duration-500">
+        <!-- Header -->
+        <header class="bg-white shadow-lg border-b-4 border-blue-500">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="text-3xl">📊</div>
+                        <h1 class="text-2xl font-bold text-gray-800">KPI(XS) PEA NAKHONPHANOM</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Quick Links -->
+                        <div class="flex space-x-2">
+                            <button onclick="openLink('https://peaex.pea.co.th/reports/powerbi/PRD/%E0%B8%81%E0%B8%9F%E0%B8%89.1%20%E0%B8%AD%E0%B8%B8%E0%B8%94%E0%B8%A3%E0%B8%98%E0%B8%B2%E0%B8%99%E0%B8%B5/%E0%B8%81%E0%B8%9A%E0%B8%A5./Dashboard-KPIs-BI')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                📄 LINK KPI NE1
+                            </button>
+                            <button onclick="openLink('https://docs.google.com/spreadsheets/d/1kkvzGDXVpJWeDtDobtYIbwoTYpJdFaXVuiZO0nHuhxQ/edit?gid=387811623#gid=387811623')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                ⚙️ LINK KPI SHEET
+                            </button>
+                            <button onclick="openLink('https://docs.google.com')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                📄 KPI_LMS PEA_NAKHONPHANOM
+                            </button>
+                        </div>
+                        <button id="logoutBtn" class="bg-gray-200 hover:bg-gray-200 text-white px-4 py-2 rounded-lg transition-colors">
+                            🚪 ออกจากระบบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <div class="container mx-auto px-6 py-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    🔍 ตัวกรองข้อมูล
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- KPI Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">หัวข้อ KPIs</label>
+                        <select id="kpiFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">ทั้งหมด</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Group Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Group</label>
+                        <div class="relative">
+                            <button id="groupFilterBtn" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-left bg-white hover:bg-gray-50">
+                                เลือก Group
+                            </button>
+                            <div id="groupFilterDropdown" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-50 hidden max-h-48 overflow-y-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PEA Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">PEA</label>
+                        <div class="relative">
+                            <button id="peaFilterBtn" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-left bg-white hover:bg-gray-50">
+                                เลือก PEA
+                            </button>
+                            <div id="peaFilterDropdown" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-50 hidden max-h-80 overflow-y-auto">
+                                <div class="p-3 border-b border-gray-200">
+                                    <input type="text" id="peaSearchInput" placeholder="🔍 ค้นหา PEA..." 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div id="peaFilterOptions">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+
+            <!-- Charts and Tables Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Line Chart -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            📈 กราฟแสดงผลการดำเนินงาน
+                        </h3>
+                        <div class="flex space-x-2">
+                            <button id="prevKpiBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                ◀ Previous
+                            </button>
+                            <button id="nextKpiBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                Next ▶
+                            </button>
+                            <button id="expandChartBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                🔍 ขยายกราฟ
+                            </button>
+                            <button id="downloadChartBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                📥 โหลดกราฟ
+                            </button>
+                        </div>
+                    </div>
+                    <div id="chartDescription" class="mb-2 text-sm text-gray-600 font-medium"></div>
+                    <div class="h-96">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                    
+                    <!-- Notes Section -->
+                    <div id="notesSection" class="mt-4 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                        <h4 class="font-medium text-gray-800 mb-2">📝 หมายเหตุ:</h4>
+                        <div id="notesContent" class="text-sm text-gray-600">
+                            ไม่มีหมายเหตุ
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ranking Table -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            🏆 ผลการดำเนินงาน
+                        </h3>
+                        <div class="flex space-x-2">
+                            <button id="expandTableBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                🔍 ขยายตาราง
+                            </button>
+                            <button id="downloadTableBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                📥 โหลดภาพตาราง
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-3 py-2 text-left bg-gray-50">🏆อันดับ</th>
+                                    <th class="px-3 py-2 text-left bg-gray-50">PEA</th>
+                                    <th class="px-3 py-2 text-left bg-gray-50">ผลดำเนินงาน</th>
+                                    <th class="px-3 py-2 text-left bg-gray-50">คิดเป็น%</th>
+                                    <th class="px-3 py-2 text-left bg-gray-50">คะแนน KPIs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Summary Table -->
+            <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                        📋 สรุปคะแนน KPIs
+                    </h3>
+                    <button id="toggleSummary" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                        ▼ ขยาย/ย่อ
+                    </button>
+                </div>
+                <div id="summaryTable" class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left">ลำดับ</th>
+                                <th class="px-4 py-3 text-left">PEA</th>
+                                <th class="px-4 py-3 text-left">⭐ ผ่าน 5 คะแนน</th>
+                                <th class="px-4 py-3 text-left">❌ ไม่ผ่าน 5 คะแนน</th>
+                                <th class="px-4 py-3 text-left">❓ รอผล</th>
+                                <th class="px-4 py-3 text-left">รวม</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 py-6 bg-white border-t border-gray-200">
+            <div class="container mx-auto px-6 text-center">
+                <p class="text-gray-600 text-sm">
+                    <span class="font-medium">Web Developer:</span> นายศุภกฤษ ทะวัง (ชผ.บส.กฟส.นพ.กฟฉ.1)
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chart Fullscreen Modal -->
+    <div id="chartModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="w-full h-full p-4 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-white">📈 กราฟแสดงผลการดำเนินงาน</h3>
+                <div class="flex space-x-3">
+                    <button id="fullscreenPrevKpiBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        ◀ Previous
+                    </button>
+                    <button id="fullscreenNextKpiBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        Next ▶
+                    </button>
+                    <button id="closeChartModal" class="text-white hover:text-gray-300 text-3xl bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">
+                        ✕ ปิด
+                    </button>
+                </div>
+            </div>
+            <div id="fullscreenChartDescription" class="mb-4 text-white text-lg font-medium"></div>
+            <div class="flex-1 bg-white rounded-lg p-4">
+                <canvas id="fullscreenChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Fullscreen Modal -->
+    <div id="tableModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="w-full h-full p-4 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-white">🏆 ผลการดำเนินงาน</h3>
+                <button id="closeTableModal" class="text-white hover:text-gray-300 text-3xl bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">
+                    ✕ ปิด
+                </button>
+            </div>
+            <div class="flex-1 bg-white rounded-lg p-4 overflow-auto">
+                <table id="fullscreenTable" class="w-full text-sm">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left bg-gray-50">🏆อันดับ</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">PEA</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">ผลดำเนินงาน</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">คิดเป็น%</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">คะแนน KPIs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fullscreenTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Detail Modal -->
+    <div id="kpiModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 shadow-2xl w-11/12 max-w-4xl max-h-5/6 overflow-hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-800"></h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="overflow-y-auto max-h-96">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left bg-gray-50">หัวข้อ KPIs</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">PEA</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">ผลดำเนินงาน</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">คิดเป็น%</th>
+                            <th class="px-4 py-3 text-left bg-gray-50">คะแนน KPIs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Loading Indicator -->
+    <div id="dataLoadingIndicator" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden" style="z-index: 9999;">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-md w-full mx-4">
+            <div class="relative mb-6">
+                <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-2xl">📊</div>
+                </div>
+            </div>
+            <h3 id="loadingTitle" class="text-xl font-bold text-gray-800 mb-3">กำลังโหลดข้อมูล...</h3>
+            <p id="loadingMessage" class="text-gray-600 mb-4">ระบบกำลังดึงข้อมูลจาก DATA BASE</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div id="loadingProgress" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-center space-x-1">
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg border-l-4 p-4 max-w-md">
+            <div class="flex items-center">
+                <div id="notificationIcon" class="text-2xl mr-3"></div>
+                <div>
+                    <p id="notificationMessage" class="text-gray-800 font-medium"></p>
+                </div>
+                <button id="closeNotification" class="ml-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let rawData = [];
+        let filteredData = [];
+        let chart = null;
+        let selectedGroups = [];
+        let selectedPEAs = [];
+        let loginCredentials = { username: 'npn', password: 'sr123' };
+        let uniqueKPIs = [];
+        let currentKPIIndex = 0;
+
+        // Apps Script URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzF7oFjJ4g5sB7t_eYHwZSofsKkCR2YS9wwF1qcx2aJIDlq6JZ-uRUdtnAV-kn02T7q5g/exec';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadDataFromSheets();
+        });
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Add Enter key support for login inputs
+            document.getElementById('username').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('password').focus();
+                }
+            });
+            
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                }
+            });
+
+            // Filters
+            document.getElementById('kpiFilter').addEventListener('change', function() {
+                applyFilters();
+                updateNavigationButtons();
+            });
+            document.getElementById('groupFilterBtn').addEventListener('click', toggleGroupDropdown);
+            document.getElementById('peaFilterBtn').addEventListener('click', togglePEADropdown);
+
+            // Summary table toggle
+            document.getElementById('toggleSummary').addEventListener('click', toggleSummaryTable);
+
+            // Modal
+            document.getElementById('closeModal').addEventListener('click', closeKPIModal);
+            
+            // Chart and Table expansion
+            document.getElementById('expandChartBtn').addEventListener('click', expandChart);
+            document.getElementById('closeChartModal').addEventListener('click', closeChartModal);
+            document.getElementById('downloadChartBtn').addEventListener('click', downloadChart);
+            
+            document.getElementById('expandTableBtn').addEventListener('click', expandTable);
+            document.getElementById('closeTableModal').addEventListener('click', closeTableModal);
+            document.getElementById('downloadTableBtn').addEventListener('click', downloadTable);
+
+            // KPI Navigation
+            document.getElementById('prevKpiBtn').addEventListener('click', previousKPI);
+            document.getElementById('nextKpiBtn').addEventListener('click', nextKPI);
+            
+            // Fullscreen KPI Navigation
+            document.getElementById('fullscreenPrevKpiBtn').addEventListener('click', fullscreenPreviousKPI);
+            document.getElementById('fullscreenNextKpiBtn').addEventListener('click', fullscreenNextKPI);
+
+            // Notification close
+            document.getElementById('closeNotification').addEventListener('click', hideNotification);
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#groupFilterBtn') && !e.target.closest('#groupFilterDropdown')) {
+                    document.getElementById('groupFilterDropdown').classList.add('hidden');
+                }
+                if (!e.target.closest('#peaFilterBtn') && !e.target.closest('#peaFilterDropdown')) {
+                    document.getElementById('peaFilterDropdown').classList.add('hidden');
+                }
+            });
+
+            // Prevent search input from closing dropdown
+            document.getElementById('peaSearchInput').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Validate input
+            if (!username || !password) {
+                document.getElementById('loginError').textContent = 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
+                document.getElementById('loginError').classList.remove('hidden');
+                return;
+            }
+
+            // Hide error message
+            document.getElementById('loginError').classList.add('hidden');
+            
+            // Show loading alert with proper display and z-index
+            const loadingAlert = document.getElementById('loadingAlert');
+            loadingAlert.style.display = 'flex';
+            loadingAlert.style.position = 'fixed';
+            loadingAlert.style.top = '0';
+            loadingAlert.style.left = '0';
+            loadingAlert.style.width = '100%';
+            loadingAlert.style.height = '100%';
+            loadingAlert.style.zIndex = '9999';
+            loadingAlert.classList.remove('hidden');
+            
+            // Force browser to render the element
+            loadingAlert.offsetHeight;
+            loadingAlert.scrollTop;
+
+            try {
+                // Wait for visual confirmation (3 seconds)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Try to load credentials from Google Sheets
+                try {
+                    const response = await fetch(`${APPS_SCRIPT_URL}?action=getConfig`);
+                    const config = await response.json();
+                    
+                    if (config.username && config.password) {
+                        loginCredentials = config;
+                    }
+                } catch (error) {
+                    console.log('Using default credentials');
+                }
+
+                // Check credentials
+                if (username === loginCredentials.username && password === loginCredentials.password) {
+                    // Hide loading alert
+                    loadingAlert.style.display = 'none';
+                    loadingAlert.classList.add('hidden');
+                    
+                    // Success - enter dashboard
+                    document.getElementById('loginModal').style.display = 'none';
+                    document.getElementById('dashboard').classList.remove('blur-bg', 'opacity-40');
+                    document.getElementById('dashboard').classList.add('opacity-100');
+                } else {
+                    // Hide loading alert
+                    loadingAlert.style.display = 'none';
+                    loadingAlert.classList.add('hidden');
+                    
+                    // Show error
+                    document.getElementById('loginError').textContent = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+                    document.getElementById('loginError').classList.remove('hidden');
+                }
+            } catch (error) {
+                // Hide loading alert on error
+                loadingAlert.style.display = 'none';
+                loadingAlert.classList.add('hidden');
+                
+                document.getElementById('loginError').textContent = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('dashboard').classList.add('blur-bg', 'opacity-40');
+            document.getElementById('dashboard').classList.remove('opacity-100');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        async function loadDataFromSheets() {
+            // Show loading indicator
+            showLoadingIndicator('กำลังโหลดข้อมูล...');
+            
+            try {
+                console.log('เริ่มดึงข้อมูลจาก Google Sheets...');
+                
+                // Add timeout for the request
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`, {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log(`ได้รับข้อมูล ${data.length} แถว`);
+                
+                if (data && data.length > 0) {
+                    // Process data in chunks to avoid blocking UI
+                    const chunkSize = 500;
+                    rawData = [];
+                    
+                    for (let i = 1; i < data.length; i += chunkSize) {
+                        const chunk = data.slice(i, Math.min(i + chunkSize, data.length));
+                        const processedChunk = chunk.map((row, index) => ({
+                            id: i + index - 1,
+                            kpi: (row[0] || '').toString().trim(),
+                            pea: (row[1] || '').toString().trim(),
+                            yearlyTarget: parseFloat(row[2]) || 0,
+                            cumulativeTarget: parseFloat(row[3]) || 0,
+                            performance: parseFloat(row[4]) || 0,
+                            percentage: parseFloat(row[5]) || 0,
+                            unit: (row[6] || '').toString().trim(),
+                            weight: parseFloat(row[7]) || 0,
+                            kpiScore: parseFloat(row[8]) || 0,
+                            notes: (row[9] || '').toString().trim(),
+                            group: (row[10] || '').toString().trim()
+                        }));
+                        
+                        rawData.push(...processedChunk);
+                        
+                        // Update progress
+                        const progress = Math.min(100, Math.round((i / data.length) * 100));
+                        updateLoadingProgress(`กำลังประมวลผลข้อมูล... ${progress}%`);
+                        
+                        // Allow UI to update
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+                    
+                    console.log(`ประมวลผลข้อมูลเสร็จสิ้น: ${rawData.length} รายการ`);
+                    
+                    // Keep all data rows (no filtering)
+                    console.log(`ข้อมูลทั้งหมด: ${rawData.length} รายการ`);
+                    
+                    hideLoadingIndicator();
+                    setupFilters();
+                    applyFilters();
+                    
+                    // Show success message
+                    showNotification(`โหลดข้อมูลสำเร็จ: ${rawData.length.toLocaleString()} รายการ`, 'success');
+                    
+                } else {
+                    throw new Error('ไม่พบข้อมูลใน Google Sheets');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                hideLoadingIndicator();
+                
+                if (error.name === 'AbortError') {
+                    showNotification('การโหลดข้อมูลใช้เวลานานเกินไป กำลังใช้ข้อมูลตัวอย่าง', 'warning');
+                } else {
+                    showNotification(`เกิดข้อผิดพลาด: ${error.message} กำลังใช้ข้อมูลตัวอย่าง`, 'error');
+                }
+                
+                // Use sample data if sheets unavailable
+                loadSampleData();
+            }
+        }
+
+        function loadSampleData() {
+            rawData = [
+                { id: 1, kpi: 'KPI 1', pea: 'PEA 1', yearlyTarget: 100, cumulativeTarget: 80, performance: 85, percentage: 85, unit: '%', weight: 10, kpiScore: 4.5, notes: 'ดำเนินการได้ดี', group: 'Group A' },
+                { id: 2, kpi: 'KPI 2', pea: 'PEA 2', yearlyTarget: 120, cumulativeTarget: 90, performance: 95, percentage: 79, unit: 'หน่วย', weight: 15, kpiScore: 5.0, notes: 'เป็นไปตามเป้า', group: 'Group B' },
+                { id: 3, kpi: 'KPI 1', pea: 'PEA 3', yearlyTarget: 80, cumulativeTarget: 70, performance: 75, percentage: 94, unit: '%', weight: 12, kpiScore: 4.8, notes: 'ต้องปรับปรุง', group: 'Group A' }
+            ];
+            setupFilters();
+            applyFilters();
+        }
+
+        function setupFilters() {
+            // Setup KPI filter
+            const kpiFilter = document.getElementById('kpiFilter');
+            uniqueKPIs = [...new Set(rawData.map(item => item.kpi))];
+            kpiFilter.innerHTML = '<option value="">ทั้งหมด</option>';
+            uniqueKPIs.forEach(kpi => {
+                kpiFilter.innerHTML += `<option value="${kpi}">${kpi}</option>`;
+            });
+
+            // Setup Group filter
+            const uniqueGroups = [...new Set(rawData.map(item => item.group))];
+            setupCheckboxFilter('groupFilterDropdown', uniqueGroups, selectedGroups, 'group');
+
+            // Setup PEA filter
+            const uniquePEAs = [...new Set(rawData.map(item => item.pea))];
+            setupCheckboxFilter('peaFilterDropdown', uniquePEAs, selectedPEAs, 'pea');
+
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
+
+        function setupCheckboxFilter(containerId, options, selectedArray, type) {
+            let targetContainer;
+            
+            if (type === 'pea') {
+                // For PEA filter, use the options container inside the dropdown
+                targetContainer = document.getElementById('peaFilterOptions');
+                
+                // Setup search functionality
+                const searchInput = document.getElementById('peaSearchInput');
+                searchInput.addEventListener('input', function() {
+                    filterPEAOptions(this.value.toLowerCase());
+                });
+                
+                // Clear search when dropdown opens
+                document.getElementById('peaFilterBtn').addEventListener('click', function() {
+                    searchInput.value = '';
+                    filterPEAOptions('');
+                });
+            } else {
+                targetContainer = document.getElementById(containerId);
+            }
+            
+            const container = targetContainer;
+            container.innerHTML = '';
+            
+            // Sort options - PEA should follow exact sheet order
+            let sortedOptions = [...options];
+            if (type === 'pea') {
+                // Sort PEA according to exact sheet order (maintain original rawData order)
+                const peaOrder = [...new Set(rawData.map(item => item.pea))];
+                sortedOptions = options.sort((a, b) => {
+                    const indexA = peaOrder.indexOf(a);
+                    const indexB = peaOrder.indexOf(b);
+                    return indexA - indexB;
+                });
+            }
+            
+            // Add "Select All" option
+            const selectAllDiv = document.createElement('div');
+            selectAllDiv.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200 select-all-option';
+            selectAllDiv.innerHTML = `
+                <label class="flex items-center cursor-pointer font-medium text-blue-600">
+                    <input type="checkbox" class="mr-2 select-all-checkbox" ${selectedArray.length === options.length ? 'checked' : ''}>
+                    <span>✅ เลือกทั้งหมด</span>
+                </label>
+            `;
+            
+            selectAllDiv.querySelector('input').addEventListener('change', function() {
+                const checkboxes = container.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)');
+                const visibleCheckboxes = Array.from(checkboxes).filter(cb => 
+                    !cb.closest('.option-item').classList.contains('hidden')
+                );
+                
+                if (this.checked) {
+                    // Select all visible options
+                    visibleCheckboxes.forEach(cb => {
+                        cb.checked = true;
+                        if (!selectedArray.includes(cb.value)) {
+                            selectedArray.push(cb.value);
+                        }
+                    });
+                } else {
+                    // Deselect all visible options
+                    visibleCheckboxes.forEach(cb => {
+                        cb.checked = false;
+                        const index = selectedArray.indexOf(cb.value);
+                        if (index > -1) {
+                            selectedArray.splice(index, 1);
+                        }
+                    });
+                }
+                
+                updateFilterButtonText(type);
+                
+                // Handle related filtering
+                if (type === 'group') {
+                    updateRelatedPEAFilter();
+                }
+                
+                applyFilters();
+            });
+            
+            container.appendChild(selectAllDiv);
+            
+            sortedOptions.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer option-item';
+                div.setAttribute('data-option', option.toLowerCase());
+                div.innerHTML = `
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" value="${option}" class="mr-2" ${selectedArray.includes(option) ? 'checked' : ''}>
+                        <span>${option}</span>
+                    </label>
+                `;
+                
+                div.querySelector('input').addEventListener('change', function() {
+                    const selectAllCheckbox = container.querySelector('.select-all-checkbox');
+                    
+                    if (this.checked) {
+                        if (!selectedArray.includes(option)) {
+                            selectedArray.push(option);
+                        }
+                    } else {
+                        const index = selectedArray.indexOf(option);
+                        if (index > -1) {
+                            selectedArray.splice(index, 1);
+                        }
+                    }
+                    
+                    // Update select all checkbox based on visible items
+                    const visibleCheckboxes = Array.from(container.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)')).filter(cb => 
+                        !cb.closest('.option-item').classList.contains('hidden')
+                    );
+                    const checkedVisibleCheckboxes = visibleCheckboxes.filter(cb => cb.checked);
+                    selectAllCheckbox.checked = visibleCheckboxes.length > 0 && checkedVisibleCheckboxes.length === visibleCheckboxes.length;
+                    
+                    updateFilterButtonText(type);
+                    
+                    // Handle related filtering
+                    if (type === 'group') {
+                        updateRelatedPEAFilter();
+                    }
+                    
+                    applyFilters();
+                });
+                
+                container.appendChild(div);
+            });
+        }
+
+        function filterPEAOptions(searchTerm) {
+            const container = document.getElementById('peaFilterOptions');
+            const options = container.querySelectorAll('.option-item');
+            const selectAllOption = container.querySelector('.select-all-option');
+            
+            let visibleCount = 0;
+            options.forEach(option => {
+                const text = option.getAttribute('data-option');
+                if (text.includes(searchTerm)) {
+                    option.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    option.classList.add('hidden');
+                }
+            });
+            
+            // Update select all checkbox based on visible items
+            const selectAllCheckbox = container.querySelector('.select-all-checkbox');
+            const visibleCheckboxes = Array.from(container.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)')).filter(cb => 
+                !cb.closest('.option-item').classList.contains('hidden')
+            );
+            const checkedVisibleCheckboxes = visibleCheckboxes.filter(cb => cb.checked);
+            selectAllCheckbox.checked = visibleCheckboxes.length > 0 && checkedVisibleCheckboxes.length === visibleCheckboxes.length;
+            
+            // Show/hide select all option based on visible items
+            if (visibleCount > 0) {
+                selectAllOption.classList.remove('hidden');
+            } else {
+                selectAllOption.classList.add('hidden');
+            }
+        }
+
+        function updateFilterButtonText(type) {
+            if (type === 'group') {
+                const btn = document.getElementById('groupFilterBtn');
+                btn.textContent = selectedGroups.length > 0 ? `เลือกแล้ว (${selectedGroups.length})` : 'เลือก Group';
+            } else if (type === 'pea') {
+                const btn = document.getElementById('peaFilterBtn');
+                btn.textContent = selectedPEAs.length > 0 ? `เลือกแล้ว (${selectedPEAs.length})` : 'เลือก PEA';
+            }
+        }
+
+        function updateRelatedPEAFilter() {
+            // Find all PEAs that belong to selected groups
+            const relatedPEAs = [];
+            if (selectedGroups.length > 0) {
+                rawData.forEach(item => {
+                    if (selectedGroups.includes(item.group) && !relatedPEAs.includes(item.pea)) {
+                        relatedPEAs.push(item.pea);
+                    }
+                });
+                
+                // Update PEA selection to match group selection
+                selectedPEAs.length = 0;
+                selectedPEAs.push(...relatedPEAs);
+                
+                // Update PEA checkboxes
+                const peaContainer = document.getElementById('peaFilterDropdown');
+                const peaCheckboxes = peaContainer.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)');
+                const peaSelectAll = peaContainer.querySelector('.select-all-checkbox');
+                
+                peaCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectedPEAs.includes(checkbox.value);
+                });
+                
+                // Update select all checkbox
+                const allPEAs = [...new Set(rawData.map(item => item.pea))];
+                peaSelectAll.checked = selectedPEAs.length === allPEAs.length;
+                
+                updateFilterButtonText('pea');
+            }
+        }
+
+        function toggleGroupDropdown() {
+            document.getElementById('groupFilterDropdown').classList.toggle('hidden');
+        }
+
+        function togglePEADropdown() {
+            document.getElementById('peaFilterDropdown').classList.toggle('hidden');
+        }
+
+        function applyFilters() {
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            
+            filteredData = rawData.filter(item => {
+                const kpiMatch = !kpiFilter || item.kpi === kpiFilter;
+                const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(item.group);
+                const peaMatch = selectedPEAs.length === 0 || selectedPEAs.includes(item.pea);
+                
+                return kpiMatch && groupMatch && peaMatch;
+            });
+
+            updateChart();
+            updateRankingTable();
+            updateSummaryTable();
+            updateNotes();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            // Update chart description
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const description = document.getElementById('chartDescription');
+            if (kpiFilter) {
+                description.textContent = `กำลังแสดงผลของ "${kpiFilter}"`;
+                description.classList.remove('hidden');
+            } else {
+                description.textContent = 'กำลังแสดงผลของ "ทุกหัวข้อ KPIs"';
+                description.classList.remove('hidden');
+            }
+
+            const labels = [...new Set(filteredData.map(item => item.pea))];
+            const performanceData = labels.map(pea => {
+                const item = filteredData.find(d => d.pea === pea);
+                return item ? item.performance : 0;
+            });
+            const yearlyTargetData = labels.map(pea => {
+                const item = filteredData.find(d => d.pea === pea);
+                return item ? item.yearlyTarget : 0;
+            });
+            const cumulativeTargetData = labels.map(pea => {
+                const item = filteredData.find(d => d.pea === pea);
+                return item ? item.cumulativeTarget : 0;
+            });
+
+            // Highlight กฟส.นพ.
+            const highlightColors = labels.map(label => 
+                label.includes('กฟส.นพ.') ? 'rgb(255, 193, 7)' : 'rgb(59, 130, 246)'
+            );
+            const highlightBgColors = labels.map(label => 
+                label.includes('กฟส.นพ.') ? 'rgba(255, 193, 7, 0.2)' : 'rgba(59, 130, 246, 0.1)'
+            );
+
+            // Register the datalabels plugin
+            Chart.register(ChartDataLabels);
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'ผลดำเนินงาน',
+                            data: performanceData,
+                            borderColor: highlightColors,
+                            backgroundColor: highlightBgColors,
+                            pointBackgroundColor: highlightColors,
+                            pointBorderColor: highlightColors,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'เป้าหมายรายปี',
+                            data: yearlyTargetData,
+                            borderColor: 'rgba(34, 197, 94, 0.4)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.05)',
+                            pointBackgroundColor: 'rgba(34, 197, 94, 0.4)',
+                            pointBorderColor: 'rgba(34, 197, 94, 0.4)',
+                            pointRadius: 4,
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        {
+                            label: 'เป้าสะสม',
+                            data: cumulativeTargetData,
+                            borderColor: 'rgba(239, 68, 68, 0.4)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                            pointBackgroundColor: 'rgba(239, 68, 68, 0.4)',
+                            pointBorderColor: 'rgba(239, 68, 68, 0.4)',
+                            pointRadius: 4,
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: 2,
+                            borderDash: [10, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            onClick: function(e, legendItem, legend) {
+                                const index = legendItem.datasetIndex;
+                                const ci = legend.chart;
+                                if (ci.isDatasetVisible(index)) {
+                                    ci.hide(index);
+                                    legendItem.hidden = true;
+                                } else {
+                                    ci.show(index);
+                                    legendItem.hidden = false;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true, // Show on all datasets
+                            color: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    return label.includes('กฟส.นพ.') ? '#92400E' : '#1E40AF';
+                                } else if (context.datasetIndex === 1) {
+                                    return '#15803D'; // Green for yearly target
+                                } else {
+                                    return '#DC2626'; // Red for cumulative target
+                                }
+                            },
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            align: function(context) {
+                                if (context.datasetIndex === 0) return 'top';
+                                if (context.datasetIndex === 1) return 'bottom';
+                                return 'left';
+                            },
+                            anchor: function(context) {
+                                if (context.datasetIndex === 0) return 'end';
+                                if (context.datasetIndex === 1) return 'start';
+                                return 'center';
+                            },
+                            offset: function(context) {
+                                if (context.datasetIndex === 0) return 4;
+                                if (context.datasetIndex === 1) return 4;
+                                return 8;
+                            },
+                            formatter: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        tooltip: {
+                            position: 'nearest',
+                            intersect: false,
+                            mode: 'point',
+                            caretPadding: 10,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += parseFloat(context.parsed.y).toLocaleString();
+                                        // Add unit if available
+                                        const unit = filteredData.length > 0 ? filteredData[0].unit : '';
+                                        if (unit) {
+                                            label += ' ' + unit;
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: filteredData.length > 0 ? filteredData[0].unit : 'หน่วย'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'PEA'
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 10
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRankingTable() {
+            const tbody = document.getElementById('rankingTableBody');
+            const sortedData = [...filteredData].sort((a, b) => b.performance - a.performance);
+            
+            tbody.innerHTML = '';
+            sortedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const isHighlight = item.pea.includes('กฟส.นพ.');
+                
+                if (isHighlight) {
+                    row.className = 'bg-yellow-100 border-l-4 border-yellow-500 font-medium';
+                } else {
+                    row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${index + 1}</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.pea}</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toLocaleString()}</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.percentage.toFixed(1)}%</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateSummaryTable() {
+            const tbody = document.getElementById('summaryTableBody');
+            const peaGroups = {};
+            
+            // Apply filters to determine which data to show in summary
+            const dataToSummarize = rawData.filter(item => {
+                const kpiFilter = document.getElementById('kpiFilter').value;
+                const kpiMatch = !kpiFilter || item.kpi === kpiFilter;
+                const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(item.group);
+                const peaMatch = selectedPEAs.length === 0 || selectedPEAs.includes(item.pea);
+                
+                return kpiMatch && groupMatch && peaMatch;
+            });
+            
+            // Get unique PEAs from filtered data
+            const uniquePEAsInData = [...new Set(dataToSummarize.map(item => item.pea))];
+            
+            // Group data by PEA
+            dataToSummarize.forEach(item => {
+                if (!peaGroups[item.pea]) {
+                    peaGroups[item.pea] = { pass: [], fail: [], pending: [], total: 0 };
+                }
+                
+                peaGroups[item.pea].total++;
+                if (item.kpiScore >= 5) {
+                    peaGroups[item.pea].pass.push(item);
+                } else if (item.kpiScore > 0) {
+                    peaGroups[item.pea].fail.push(item);
+                } else {
+                    peaGroups[item.pea].pending.push(item);
+                }
+            });
+
+            tbody.innerHTML = '';
+            
+            // Sort by exact original order in sheet (maintain the order from rawData)
+            const peaOrder = [...new Set(rawData.map(item => item.pea))];
+            const filteredPEAOrder = peaOrder.filter(pea => uniquePEAsInData.includes(pea));
+            
+            // Maintain exact sheet order without any special prioritization
+            filteredPEAOrder.sort((a, b) => {
+                const indexA = peaOrder.indexOf(a);
+                const indexB = peaOrder.indexOf(b);
+                return indexA - indexB;
+            });
+            
+            filteredPEAOrder.forEach((pea, index) => {
+                const stats = peaGroups[pea];
+                if (!stats) return; // Skip if no data for this PEA
+                
+                const row = document.createElement('tr');
+                // Use standard row styling without special highlighting
+                row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                
+                const highlightClass = '';
+                const greenClass = 'text-green-600';
+                const redClass = 'text-red-600';
+                const yellowClass = 'text-yellow-600';
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 ${highlightClass}">${index + 1}</td>
+                    <td class="px-4 py-3 ${highlightClass} font-semibold">${pea}</td>
+                    <td class="px-4 py-3 ${greenClass} font-medium cursor-pointer hover:bg-green-100 rounded" 
+                        onclick="showKPIDetails('${pea}', 'pass', '⭐ ผ่าน 5 คะแนน')">${stats.pass.length}</td>
+                    <td class="px-4 py-3 ${redClass} font-medium cursor-pointer hover:bg-red-100 rounded" 
+                        onclick="showKPIDetails('${pea}', 'fail', '❌ ไม่ผ่าน 5 คะแนน')">${stats.fail.length}</td>
+                    <td class="px-4 py-3 ${yellowClass} font-medium cursor-pointer hover:bg-yellow-100 rounded" 
+                        onclick="showKPIDetails('${pea}', 'pending', '❓ รอผล')">${stats.pending.length}</td>
+                    <td class="px-4 py-3 font-semibold ${highlightClass}">${stats.total}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateNotes() {
+            const notesContent = document.getElementById('notesContent');
+            const notesWithPEA = filteredData
+                .filter(item => item.notes && item.notes.trim() !== '')
+                .map(item => ({ pea: item.pea, notes: item.notes }));
+            
+            if (notesWithPEA.length > 0) {
+                notesContent.innerHTML = notesWithPEA
+                    .map(item => `• <strong>${item.pea}:</strong> ${item.notes}`)
+                    .join('<br>');
+            } else {
+                notesContent.textContent = 'ไม่มีหมายเหตุ';
+            }
+        }
+
+        function toggleSummaryTable() {
+            const table = document.getElementById('summaryTable');
+            const btn = document.getElementById('toggleSummary');
+            
+            if (table.style.display === 'none') {
+                table.style.display = 'block';
+                btn.textContent = '▼ ขยาย/ย่อ';
+            } else {
+                table.style.display = 'none';
+                btn.textContent = '▶ ขยาย/ย่อ';
+            }
+        }
+
+
+
+        function openLink(url) {
+            window.open(url, '_blank');
+        }
+
+        function showKPIDetails(pea, type, title) {
+            const modal = document.getElementById('kpiModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalTableBody = document.getElementById('modalTableBody');
+            
+            // Find all KPIs for this PEA and type
+            let kpiData = [];
+            rawData.forEach(item => {
+                if (item.pea === pea) {
+                    if (type === 'pass' && item.kpiScore >= 5) {
+                        kpiData.push(item);
+                    } else if (type === 'fail' && item.kpiScore > 0 && item.kpiScore < 5) {
+                        kpiData.push(item);
+                    } else if (type === 'pending' && item.kpiScore === 0) {
+                        kpiData.push(item);
+                    }
+                }
+            });
+            
+            modalTitle.textContent = `${title} - ${pea}`;
+            modalTableBody.innerHTML = '';
+            
+            kpiData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const isHighlight = item.pea.includes('กฟส.นพ.');
+                
+                if (isHighlight) {
+                    row.className = 'bg-yellow-100 border-l-4 border-yellow-500';
+                } else {
+                    row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.kpi}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.pea}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toLocaleString()}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.percentage.toFixed(1)}%</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(1)}</td>
+                `;
+                modalTableBody.appendChild(row);
+            });
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeKPIModal() {
+            document.getElementById('kpiModal').classList.add('hidden');
+        }
+
+        // KPI Navigation Functions
+        function previousKPI() {
+            if (uniqueKPIs.length === 0) return;
+            
+            currentKPIIndex = (currentKPIIndex - 1 + uniqueKPIs.length) % uniqueKPIs.length;
+            document.getElementById('kpiFilter').value = uniqueKPIs[currentKPIIndex];
+            applyFilters();
+            updateNavigationButtons();
+        }
+
+        function nextKPI() {
+            if (uniqueKPIs.length === 0) return;
+            
+            currentKPIIndex = (currentKPIIndex + 1) % uniqueKPIs.length;
+            document.getElementById('kpiFilter').value = uniqueKPIs[currentKPIIndex];
+            applyFilters();
+            updateNavigationButtons();
+        }
+
+        // Fullscreen KPI Navigation Functions
+        function fullscreenPreviousKPI() {
+            if (uniqueKPIs.length === 0) return;
+            
+            currentKPIIndex = (currentKPIIndex - 1 + uniqueKPIs.length) % uniqueKPIs.length;
+            document.getElementById('kpiFilter').value = uniqueKPIs[currentKPIIndex];
+            applyFilters();
+            updateNavigationButtons();
+            updateFullscreenNavigationButtons();
+            
+            // Update fullscreen chart
+            if (document.getElementById('chartModal').classList.contains('hidden') === false) {
+                setTimeout(() => {
+                    expandChart();
+                }, 100);
+            }
+        }
+
+        function fullscreenNextKPI() {
+            if (uniqueKPIs.length === 0) return;
+            
+            currentKPIIndex = (currentKPIIndex + 1) % uniqueKPIs.length;
+            document.getElementById('kpiFilter').value = uniqueKPIs[currentKPIIndex];
+            applyFilters();
+            updateNavigationButtons();
+            updateFullscreenNavigationButtons();
+            
+            // Update fullscreen chart
+            if (document.getElementById('chartModal').classList.contains('hidden') === false) {
+                setTimeout(() => {
+                    expandChart();
+                }, 100);
+            }
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevKpiBtn');
+            const nextBtn = document.getElementById('nextKpiBtn');
+            
+            if (uniqueKPIs.length <= 1) {
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Update current KPI index based on selected filter
+            const currentKPI = document.getElementById('kpiFilter').value;
+            if (currentKPI && uniqueKPIs.includes(currentKPI)) {
+                currentKPIIndex = uniqueKPIs.indexOf(currentKPI);
+            } else {
+                currentKPIIndex = 0;
+            }
+            
+            // Update fullscreen navigation buttons
+            updateFullscreenNavigationButtons();
+        }
+
+        function updateFullscreenNavigationButtons() {
+            const fullscreenPrevBtn = document.getElementById('fullscreenPrevKpiBtn');
+            const fullscreenNextBtn = document.getElementById('fullscreenNextKpiBtn');
+            
+            if (uniqueKPIs.length <= 1) {
+                fullscreenPrevBtn.disabled = true;
+                fullscreenNextBtn.disabled = true;
+                fullscreenPrevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                fullscreenNextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                fullscreenPrevBtn.disabled = false;
+                fullscreenNextBtn.disabled = false;
+                fullscreenPrevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                fullscreenNextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Chart expansion functions
+        let fullscreenChart = null;
+        
+        function expandChart() {
+            const modal = document.getElementById('chartModal');
+            const fullscreenCtx = document.getElementById('fullscreenChart').getContext('2d');
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const fullscreenDescription = document.getElementById('fullscreenChartDescription');
+            
+            if (kpiFilter) {
+                fullscreenDescription.textContent = `กำลังแสดงผลของ "${kpiFilter}"`;
+            } else {
+                fullscreenDescription.textContent = 'กำลังแสดงผลของ "ทุกหัวข้อ KPIs"';
+            }
+            
+            // Copy chart data and configuration
+            if (chart && chart.data) {
+                if (fullscreenChart) {
+                    fullscreenChart.destroy();
+                }
+                
+                // Create fullscreen chart with same data but updated options
+                const labels = [...new Set(filteredData.map(item => item.pea))];
+                const performanceData = labels.map(pea => {
+                    const item = filteredData.find(d => d.pea === pea);
+                    return item ? item.performance : 0;
+                });
+                const yearlyTargetData = labels.map(pea => {
+                    const item = filteredData.find(d => d.pea === pea);
+                    return item ? item.yearlyTarget : 0;
+                });
+                const cumulativeTargetData = labels.map(pea => {
+                    const item = filteredData.find(d => d.pea === pea);
+                    return item ? item.cumulativeTarget : 0;
+                });
+
+                // Highlight colors
+                const highlightColors = labels.map(label => 
+                    label.includes('กฟส.นพ.') ? 'rgb(255, 193, 7)' : 'rgb(59, 130, 246)'
+                );
+                const highlightBgColors = labels.map(label => 
+                    label.includes('กฟส.นพ.') ? 'rgba(255, 193, 7, 0.2)' : 'rgba(59, 130, 246, 0.1)'
+                );
+                
+                fullscreenChart = new Chart(fullscreenCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'ผลดำเนินงาน',
+                                data: performanceData,
+                                borderColor: highlightColors,
+                                backgroundColor: highlightBgColors,
+                                pointBackgroundColor: highlightColors,
+                                pointBorderColor: highlightColors,
+                                pointRadius: 8,
+                                pointHoverRadius: 10,
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 4
+                            },
+                            {
+                                label: 'เป้าหมายรายปี',
+                                data: yearlyTargetData,
+                                borderColor: 'rgba(34, 197, 94, 0.6)',
+                                backgroundColor: 'rgba(34, 197, 94, 0.05)',
+                                pointBackgroundColor: 'rgba(34, 197, 94, 0.6)',
+                                pointBorderColor: 'rgba(34, 197, 94, 0.6)',
+                                pointRadius: 6,
+                                tension: 0.4,
+                                fill: false,
+                                borderWidth: 3,
+                                borderDash: [5, 5]
+                            },
+                            {
+                                label: 'เป้าสะสม',
+                                data: cumulativeTargetData,
+                                borderColor: 'rgba(239, 68, 68, 0.6)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                                pointBackgroundColor: 'rgba(239, 68, 68, 0.6)',
+                                pointBorderColor: 'rgba(239, 68, 68, 0.6)',
+                                pointRadius: 6,
+                                tension: 0.4,
+                                fill: false,
+                                borderWidth: 3,
+                                borderDash: [10, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                color: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const label = context.chart.data.labels[context.dataIndex];
+                                        return label.includes('กฟส.นพ.') ? '#92400E' : '#1E40AF';
+                                    } else if (context.datasetIndex === 1) {
+                                        return '#15803D';
+                                    } else {
+                                        return '#DC2626';
+                                    }
+                                },
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                align: function(context) {
+                                    return context.datasetIndex === 0 ? 'top' : 'bottom';
+                                },
+                                anchor: 'end',
+                                offset: 6,
+                                formatter: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            },
+                            tooltip: {
+                                position: 'nearest',
+                                intersect: false,
+                                mode: 'point',
+                                caretPadding: 10,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: 'white',
+                                bodyColor: 'white',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                borderWidth: 1,
+                                titleFont: {
+                                    size: 16
+                                },
+                                bodyFont: {
+                                    size: 14
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += parseFloat(context.parsed.y).toLocaleString();
+                                            // Add unit if available
+                                            const unit = filteredData.length > 0 ? filteredData[0].unit : '';
+                                            if (unit) {
+                                                label += ' ' + unit;
+                                            }
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: filteredData.length > 0 ? filteredData[0].unit : 'หน่วย',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'PEA',
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeChartModal() {
+            document.getElementById('chartModal').classList.add('hidden');
+            if (fullscreenChart) {
+                fullscreenChart.destroy();
+                fullscreenChart = null;
+            }
+        }
+        
+        function downloadChart() {
+            const canvas = chart ? document.getElementById('lineChart') : null;
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'กราฟแสดงผลการดำเนินงาน.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+        
+        // Table expansion functions
+        function expandTable() {
+            const modal = document.getElementById('tableModal');
+            const fullscreenTableBody = document.getElementById('fullscreenTableBody');
+            const originalTableBody = document.getElementById('rankingTableBody');
+            
+            // Copy table content
+            fullscreenTableBody.innerHTML = originalTableBody.innerHTML;
+            modal.classList.remove('hidden');
+        }
+        
+        function closeTableModal() {
+            document.getElementById('tableModal').classList.add('hidden');
+        }
+        
+        function downloadTable() {
+            // Use the current ranking table data directly
+            const sortedData = [...filteredData].sort((a, b) => b.performance - a.performance);
+            
+            // Create canvas for table screenshot
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate canvas height based on data
+            const rowHeight = 30;
+            const headerHeight = 80;
+            const titleHeight = 60;
+            const padding = 40;
+            const canvasHeight = titleHeight + headerHeight + (sortedData.length * rowHeight) + padding;
+            
+            // Set canvas size
+            canvas.width = 1200;
+            canvas.height = Math.max(canvasHeight, 400);
+            
+            // Fill background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 28px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏆 ผลการดำเนินงาน', canvas.width / 2, 40);
+            
+            // Draw table headers background
+            ctx.fillStyle = '#F3F4F6';
+            ctx.fillRect(20, titleHeight, canvas.width - 40, 40);
+            
+            // Draw table headers
+            ctx.fillStyle = '#374151';
+            ctx.font = 'bold 18px Arial, sans-serif';
+            ctx.textAlign = 'left';
+            const headers = ['🏆อันดับ', 'PEA', 'ผลดำเนินงาน', 'คิดเป็น%', 'คะแนน KPIs'];
+            const colWidths = [100, 300, 200, 150, 150];
+            let x = 40;
+            
+            headers.forEach((header, i) => {
+                ctx.fillText(header, x, titleHeight + 28);
+                x += colWidths[i];
+            });
+            
+            // Draw table data
+            ctx.font = '16px Arial, sans-serif';
+            let y = titleHeight + 60;
+            
+            sortedData.forEach((item, rowIndex) => {
+                const isHighlight = item.pea.includes('กฟส.นพ.');
+                
+                // Draw row background
+                if (isHighlight) {
+                    ctx.fillStyle = '#FEF3C7';
+                    ctx.fillRect(20, y - 25, canvas.width - 40, rowHeight);
+                } else if (rowIndex % 2 === 0) {
+                    ctx.fillStyle = '#F9FAFB';
+                    ctx.fillRect(20, y - 25, canvas.width - 40, rowHeight);
+                }
+                
+                // Draw cell data
+                x = 40;
+                const cellData = [
+                    (rowIndex + 1).toString(),
+                    item.pea,
+                    item.performance.toLocaleString(),
+                    item.percentage.toFixed(1) + '%',
+                    item.kpiScore.toFixed(1)
+                ];
+                
+                cellData.forEach((cellText, i) => {
+                    if (isHighlight) {
+                        ctx.fillStyle = '#92400E';
+                        ctx.font = 'bold 16px Arial, sans-serif';
+                    } else {
+                        ctx.fillStyle = '#374151';
+                        ctx.font = '16px Arial, sans-serif';
+                    }
+                    
+                    // Handle text wrapping for long PEA names
+                    if (i === 1 && cellText.length > 25) {
+                        const words = cellText.split(' ');
+                        let line = '';
+                        let lineY = y;
+                        
+                        words.forEach((word, wordIndex) => {
+                            const testLine = line + word + ' ';
+                            const metrics = ctx.measureText(testLine);
+                            
+                            if (metrics.width > colWidths[i] - 10 && line !== '') {
+                                ctx.fillText(line.trim(), x, lineY);
+                                line = word + ' ';
+                                lineY += 18;
+                            } else {
+                                line = testLine;
+                            }
+                        });
+                        ctx.fillText(line.trim(), x, lineY);
+                    } else {
+                        ctx.fillText(cellText, x, y);
+                    }
+                    
+                    x += colWidths[i];
+                });
+                
+                y += rowHeight;
+            });
+            
+            // Draw border lines
+            ctx.strokeStyle = '#D1D5DB';
+            ctx.lineWidth = 1;
+            
+            // Header border
+            ctx.beginPath();
+            ctx.moveTo(20, titleHeight + 40);
+            ctx.lineTo(canvas.width - 20, titleHeight + 40);
+            ctx.stroke();
+            
+            // Vertical lines
+            x = 40;
+            colWidths.forEach((width, i) => {
+                if (i < colWidths.length - 1) {
+                    x += width;
+                    ctx.beginPath();
+                    ctx.moveTo(x, titleHeight);
+                    ctx.lineTo(x, y - rowHeight + 5);
+                    ctx.stroke();
+                }
+            });
+            
+            // Outer border
+            ctx.strokeStyle = '#6B7280';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, titleHeight, canvas.width - 40, y - titleHeight - rowHeight + 5);
+            
+            // Add footer
+            ctx.fillStyle = '#6B7280';
+            ctx.font = '14px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`สร้างเมื่อ: ${new Date().toLocaleString('th-TH')}`, canvas.width / 2, y + 20);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `ผลการดำเนินงาน_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+
+        // Loading and notification functions
+        function showLoadingIndicator(message = 'กำลังโหลดข้อมูล...') {
+            const indicator = document.getElementById('dataLoadingIndicator');
+            const title = document.getElementById('loadingTitle');
+            const messageEl = document.getElementById('loadingMessage');
+            const progress = document.getElementById('loadingProgress');
+            
+            title.textContent = message;
+            messageEl.textContent = 'ระบบกำลังดึงข้อมูลจาก DATA BASE';
+            progress.style.width = '0%';
+            
+            indicator.classList.remove('hidden');
+            indicator.style.display = 'flex';
+        }
+        
+        function updateLoadingProgress(message, percent = 0) {
+            const messageEl = document.getElementById('loadingMessage');
+            const progress = document.getElementById('loadingProgress');
+            
+            messageEl.textContent = message;
+            progress.style.width = percent + '%';
+        }
+        
+        function hideLoadingIndicator() {
+            const indicator = document.getElementById('dataLoadingIndicator');
+            indicator.classList.add('hidden');
+            indicator.style.display = 'none';
+        }
+        
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('notificationToast');
+            const icon = document.getElementById('notificationIcon');
+            const messageEl = document.getElementById('notificationMessage');
+            const toastDiv = toast.querySelector('div');
+            
+            // Set icon and color based on type
+            switch (type) {
+                case 'success':
+                    icon.textContent = '✅';
+                    toastDiv.className = 'bg-white rounded-lg shadow-lg border-l-4 border-green-500 p-4 max-w-md';
+                    break;
+                case 'error':
+                    icon.textContent = '❌';
+                    toastDiv.className = 'bg-white rounded-lg shadow-lg border-l-4 border-red-500 p-4 max-w-md';
+                    break;
+                case 'warning':
+                    icon.textContent = '⚠️';
+                    toastDiv.className = 'bg-white rounded-lg shadow-lg border-l-4 border-yellow-500 p-4 max-w-md';
+                    break;
+                default:
+                    icon.textContent = 'ℹ️';
+                    toastDiv.className = 'bg-white rounded-lg shadow-lg border-l-4 border-blue-500 p-4 max-w-md';
+            }
+            
+            messageEl.textContent = message;
+            toast.classList.remove('hidden');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+        
+        function hideNotification() {
+            document.getElementById('notificationToast').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('kpiModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeKPIModal();
+            }
+        });
+        
+        document.getElementById('chartModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeChartModal();
+            }
+        });
+        
+        document.getElementById('tableModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTableModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98104fa48137893d',t:'MTc1ODE5MjkyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
