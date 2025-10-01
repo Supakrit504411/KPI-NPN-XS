@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Data Analytics Dashboard KPI PEA NAKHONPHANOM</title>
+    <title>📊 Data Analytics Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; }
-        .blur-bg { backdrop-filter: blur(3px); }
+        .blur-bg { backdrop-filter: blur(100px); }
         .smooth-line { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 blur-bg flex items-center justify-center z-50">
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl p-8 shadow-2xl w-96 transform transition-all">
             <div class="text-center mb-6">
                 <div class="text-4xl mb-2">🔐</div>
@@ -76,16 +76,16 @@
                                     class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 📄 LINK KPI NE1
                             </button>
-                            <button onclick="openLink('https://docs.google.com/spreadsheets/d/1kkvzGDXVpJWeDtDobtYIbwoTYpJdFaXVuiZO0nHuhxQ/edit?gid=387811623#gid=387811623')" 
+                            <button onclick="openLink('https://drive.google.com/drive/folders/13NdtnwtdhFZV0l8UCK_ySRDZOZRqeREp')" 
                                     class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 ⚙️ LINK KPI SHEET
                             </button>
                             <button onclick="openLink('https://kpi-npn-lms.vercel.app/')" 
-                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 📄 KPI_LMS PEA_NAKHONPHANOM
                             </button>
                         </div>
-                        <button id="logoutBtn" class="bg-gray-200 hover:bg-gray-200 text-white px-4 py-2 rounded-lg transition-colors">
+                        <button id="logoutBtn" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition-colors">
                             🚪 ออกจากระบบ
                         </button>
                     </div>
@@ -160,12 +160,13 @@
                             <button id="expandChartBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 🔍 ขยายกราฟ
                             </button>
-                            <button id="downloadChartBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <button id="downloadChartBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 📥 โหลดกราฟ
                             </button>
                         </div>
                     </div>
                     <div id="chartDescription" class="mb-2 text-sm text-gray-600 font-medium"></div>
+                    <div id="weightInfo" class="mb-2 text-sm text-blue-600 font-medium"></div>
                     <div class="h-96">
                         <canvas id="lineChart"></canvas>
                     </div>
@@ -182,11 +183,14 @@
                 <!-- Ranking Table -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                            🏆 ผลการดำเนินงาน
-                        </h3>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                                ผลการดำเนินงาน
+                            </h3>
+                            <p id="rankingKpiTitle" class="text-sm text-gray-600 mt-1"></p>
+                        </div>
                         <div class="flex space-x-2">
-                            <button id="expandTableBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <button id="expandTableBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                                 🔍 ขยายตาราง
                             </button>
                             <button id="downloadTableBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors text-sm">
@@ -198,11 +202,21 @@
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-3 py-2 text-left bg-gray-50">🏆อันดับ</th>
-                                    <th class="px-3 py-2 text-left bg-gray-50">PEA</th>
-                                    <th class="px-3 py-2 text-left bg-gray-50">ผลดำเนินงาน</th>
-                                    <th class="px-3 py-2 text-left bg-gray-50">คิดเป็น%</th>
-                                    <th class="px-3 py-2 text-left bg-gray-50">คะแนน KPIs</th>
+                                    <th class="px-3 py-2 text-left bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="sortTable('rank')">
+                                        🏆อันดับ <span id="sortRank">↕️</span>
+                                    </th>
+                                    <th class="px-3 py-2 text-left bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="sortTable('pea')">
+                                        PEA <span id="sortPea">↕️</span>
+                                    </th>
+                                    <th class="px-3 py-2 text-left bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="sortTable('performance')">
+                                        ผลดำเนินงาน <span id="sortPerformance">↕️</span>
+                                    </th>
+                                    <th class="px-3 py-2 text-left bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="sortTable('percentage')">
+                                        คิดเป็น% <span id="sortPercentage">↕️</span>
+                                    </th>
+                                    <th class="px-3 py-2 text-left bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="sortTable('kpiScore')">
+                                        คะแนน KPIs <span id="sortKpiScore">↕️</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="rankingTableBody">
@@ -218,9 +232,11 @@
                     <h3 class="text-lg font-semibold text-gray-800 flex items-center">
                         📋 สรุปคะแนน KPIs
                     </h3>
-                    <button id="toggleSummary" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                        ▼ ขยาย/ย่อ
-                    </button>
+                    <div class="flex space-x-2">
+                        <button id="toggleSummary" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            ▼ ขยาย/ย่อ
+                        </button>
+                    </div>
                 </div>
                 <div id="summaryTable" class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -232,6 +248,7 @@
                                 <th class="px-4 py-3 text-left">❌ ไม่ผ่าน 5 คะแนน</th>
                                 <th class="px-4 py-3 text-left">❓ รอผล</th>
                                 <th class="px-4 py-3 text-left">รวม</th>
+                                <th class="px-4 py-3 text-left">ดาวน์โหลด</th>
                             </tr>
                         </thead>
                         <tbody id="summaryTableBody">
@@ -239,6 +256,8 @@
                     </table>
                 </div>
             </div>
+
+
         </div>
 
         <!-- Footer -->
@@ -279,7 +298,10 @@
     <div id="tableModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
         <div class="w-full h-full p-4 flex flex-col">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-white">🏆 ผลการดำเนินงาน</h3>
+                <div>
+                    <h3 class="text-2xl font-bold text-white">🏆 อันดับผลการดำเนินงาน</h3>
+                    <p id="fullscreenRankingKpiTitle" class="text-lg text-gray-300 mt-1"></p>
+                </div>
                 <button id="closeTableModal" class="text-white hover:text-gray-300 text-3xl bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">
                     ✕ ปิด
                 </button>
@@ -337,7 +359,7 @@
                 </div>
             </div>
             <h3 id="loadingTitle" class="text-xl font-bold text-gray-800 mb-3">กำลังโหลดข้อมูล...</h3>
-            <p id="loadingMessage" class="text-gray-600 mb-4">ระบบกำลังดึงข้อมูลจาก DATA BASE</p>
+            <p id="loadingMessage" class="text-gray-600 mb-4">กรุณารอสักครู่ ระบบกำลังดึงข้อมูลจาก Google Sheets</p>
             <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
                 <div id="loadingProgress" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
@@ -345,6 +367,64 @@
                 <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
                 <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
                 <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEA Selection Modal -->
+    <div id="peaSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 shadow-2xl w-11/12 max-w-2xl max-h-5/6 overflow-hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">เลือก PEA สำหรับดาวน์โหลดภาพ</h3>
+                <button id="closePEASelectionModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="flex items-center cursor-pointer font-medium text-blue-600">
+                        <input type="checkbox" id="selectAllPEAs" class="mr-2">
+                        <span>✅ เลือกทั้งหมด</span>
+                    </label>
+                    <button id="downloadSelectedPEAsBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                        🖼️ ดาวน์โหลดที่เลือก
+                    </button>
+                </div>
+                
+                <div class="border border-gray-300 rounded-lg p-3 max-h-80 overflow-y-auto">
+                    <div id="peaSelectionList" class="space-y-2">
+                        <!-- PEA checkboxes will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-600">
+                <p>💡 เลือก PEA ที่ต้องการดาวน์โหลดภาพสรุป ภาพจะแสดงรายละเอียดข้อที่ผ่าน ไม่ผ่าน และรอผลของแต่ละ PEA</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEA Image Type Selection Modal -->
+    <div id="peaImageTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 shadow-2xl w-11/12 max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">เลือกประเภทข้อมูล</h3>
+                <button id="closePEAImageTypeModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-3">
+                <button id="downloadPassBtn" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                    ⭐ ผ่าน 5 คะแนน
+                </button>
+                <button id="downloadFailBtn" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                    ❌ ไม่ผ่าน 5 คะแนน
+                </button>
+                <button id="downloadPendingBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg transition-colors text-left">
+                    ❓ รอผล
+                </button>
+            </div>
+            
+            <div class="mt-4 text-sm text-gray-600">
+                <p>💡 เลือกประเภทข้อมูลที่ต้องการดาวน์โหลดเป็นภาพ</p>
             </div>
         </div>
     </div>
@@ -439,6 +519,17 @@
 
             // Notification close
             document.getElementById('closeNotification').addEventListener('click', hideNotification);
+
+            // PEA Selection Modal
+            document.getElementById('closePEASelectionModal').addEventListener('click', closePEASelectionModal);
+            document.getElementById('selectAllPEAs').addEventListener('change', toggleAllPEASelection);
+            document.getElementById('downloadSelectedPEAsBtn').addEventListener('click', downloadSelectedPEAsImage);
+
+            // PEA Image Type Selection Modal
+            document.getElementById('closePEAImageTypeModal').addEventListener('click', closePEAImageTypeModal);
+            document.getElementById('downloadPassBtn').addEventListener('click', () => downloadPEAImageByType('pass'));
+            document.getElementById('downloadFailBtn').addEventListener('click', () => downloadPEAImageByType('fail'));
+            document.getElementById('downloadPendingBtn').addEventListener('click', () => downloadPEAImageByType('pending'));
 
             // Close dropdowns when clicking outside
             document.addEventListener('click', function(e) {
@@ -545,7 +636,7 @@
             showLoadingIndicator('กำลังโหลดข้อมูล...');
             
             try {
-                console.log('เริ่มดึงข้อมูลจาก Google Sheets...');
+                console.log('เริ่มดึงข้อมูลจาก DATABASE...');
                 
                 // Add timeout for the request
                 const controller = new AbortController();
@@ -682,15 +773,88 @@
             const container = targetContainer;
             container.innerHTML = '';
             
-            // Sort options - PEA should follow exact sheet order
+            // Sort options - PEA should follow exact predefined order
             let sortedOptions = [...options];
             if (type === 'pea') {
-                // Sort PEA according to exact sheet order (maintain original rawData order)
-                const peaOrder = [...new Set(rawData.map(item => item.pea))];
+                // Define exact PEA order as specified
+                const exactPEAOrder = [
+                    'กฟส.อด.',
+                    'กฟส.บผอ.',
+                    'กฟส.นวซ.',
+                    'กฟส.กจบ.',
+                    'รวม กฟส.อด.',
+                    'กฟส.นค.',
+                    'กฟส.ทบ.',
+                    'กฟส.พส.',
+                    'รวม กฟส.นค.',
+                    'กฟส.ขก.',
+                    'กฟส.นพง.',
+                    'กฟส.กน.',
+                    'รวม กฟส.ขก.',
+                    'กฟส.ลย.',
+                    'กฟส.ชคน.',
+                    'กฟส.ดซ.',
+                    'รวม กฟส.ลย.',
+                    'กฟส.สน.',
+                    'กฟส.ออ.',
+                    'กฟส.พณ.',
+                    'รวม กฟส.สน.',
+                    'กฟส.นพ.',
+                    'กฟส.ธพ.',
+                    'กฟส.นก.',
+                    'กฟส.บพง.',
+                    'รวม กฟส.นพ.',
+                    'กฟส.ชมพ.',
+                    'กฟส.ภว.',
+                    'กฟส.นรอ.',
+                    'รวม กฟส.ชมพ.',
+                    'กฟส.กภว.',
+                    'รวม กฟส.กภว.',
+                    'กฟส.นห.',
+                    'กฟส.บดง.',
+                    'รวม กฟส.นห.',
+                    'กฟส.พคน.',
+                    'กฟส.วว.',
+                    'รวม กฟส.พคน.',
+                    'กฟส.นภ.',
+                    'กฟส.ศบร.',
+                    'กฟส.นกล.',
+                    'รวม กฟส.นภ.',
+                    'กฟส.บผ.',
+                    'กฟส.พล.',
+                    'กฟส.มจ.',
+                    'กฟส.นสห.',
+                    'รวม กฟส.บผ.',
+                    'กฟส.บฬ.',
+                    'กฟส.ซก.',
+                    'รวม กฟส.บฬ.',
+                    'กฟส.ขก.2',
+                    'กฟส.บฝ.',
+                    'รวม กฟส.ขก.2',
+                    'กฟส.อด.2',
+                    'กฟส.เพ็ญ',
+                    'รวม กฟส.อด.2',
+                    'กฟส.สดด.',
+                    'รวม กฟส.สดด.',
+                    'กฟส.วสพ.',
+                    'รวม กฟส.วสพ.',
+                    'รวม กฟฉ.1'
+                ];
+                
+                // Sort PEA according to exact predefined order
                 sortedOptions = options.sort((a, b) => {
-                    const indexA = peaOrder.indexOf(a);
-                    const indexB = peaOrder.indexOf(b);
-                    return indexA - indexB;
+                    const indexA = exactPEAOrder.indexOf(a);
+                    const indexB = exactPEAOrder.indexOf(b);
+                    
+                    // If both items are in the predefined order, sort by their position
+                    if (indexA !== -1 && indexB !== -1) {
+                        return indexA - indexB;
+                    }
+                    // If only one item is in the predefined order, prioritize it
+                    if (indexA !== -1) return -1;
+                    if (indexB !== -1) return 1;
+                    // If neither item is in the predefined order, sort alphabetically
+                    return a.localeCompare(b, 'th');
                 });
             }
             
@@ -831,15 +995,19 @@
 
         function updateRelatedPEAFilter() {
             // Find all PEAs that belong to selected groups
-            const relatedPEAs = [];
             if (selectedGroups.length > 0) {
+                // Get unique PEAs that belong to the selected groups using Set to avoid duplicates
+                const uniquePEAsInSelectedGroups = new Set();
                 rawData.forEach(item => {
-                    if (selectedGroups.includes(item.group) && !relatedPEAs.includes(item.pea)) {
-                        relatedPEAs.push(item.pea);
+                    if (selectedGroups.includes(item.group)) {
+                        uniquePEAsInSelectedGroups.add(item.pea);
                     }
                 });
                 
-                // Update PEA selection to match group selection
+                // Convert Set to Array to get unique PEAs only
+                const relatedPEAs = Array.from(uniquePEAsInSelectedGroups);
+                
+                // Clear and update PEA selection to match group selection
                 selectedPEAs.length = 0;
                 selectedPEAs.push(...relatedPEAs);
                 
@@ -848,15 +1016,51 @@
                 const peaCheckboxes = peaContainer.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)');
                 const peaSelectAll = peaContainer.querySelector('.select-all-checkbox');
                 
+                // Uncheck all checkboxes first
                 peaCheckboxes.forEach(checkbox => {
-                    checkbox.checked = selectedPEAs.includes(checkbox.value);
+                    checkbox.checked = false;
                 });
                 
-                // Update select all checkbox
-                const allPEAs = [...new Set(rawData.map(item => item.pea))];
-                peaSelectAll.checked = selectedPEAs.length === allPEAs.length;
+                // Then check only the related PEAs (no duplicates)
+                peaCheckboxes.forEach(checkbox => {
+                    if (relatedPEAs.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Update select all checkbox based on visible/related PEAs only
+                const visiblePEACheckboxes = Array.from(peaCheckboxes).filter(cb => 
+                    !cb.closest('.option-item').classList.contains('hidden') && 
+                    relatedPEAs.includes(cb.value)
+                );
+                const checkedVisiblePEAs = visiblePEACheckboxes.filter(cb => cb.checked);
+                peaSelectAll.checked = visiblePEACheckboxes.length > 0 && checkedVisiblePEAs.length === visiblePEACheckboxes.length;
                 
                 updateFilterButtonText('pea');
+                
+                // Debug information
+                console.log(`Selected Groups: ${selectedGroups.length}`);
+                console.log(`Unique PEAs in selected groups: ${relatedPEAs.length}`);
+                console.log(`Related PEAs:`, relatedPEAs);
+                
+                // Count actual data rows for verification
+                const actualDataCount = rawData.filter(item => selectedGroups.includes(item.group)).length;
+                console.log(`Total data rows in selected groups: ${actualDataCount}`);
+                
+            } else {
+                // If no groups selected, clear PEA selection
+                selectedPEAs.length = 0;
+                const peaContainer = document.getElementById('peaFilterDropdown');
+                const peaCheckboxes = peaContainer.querySelectorAll('input[type="checkbox"]:not(.select-all-checkbox)');
+                const peaSelectAll = peaContainer.querySelector('.select-all-checkbox');
+                
+                peaCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                peaSelectAll.checked = false;
+                
+                updateFilterButtonText('pea');
+                console.log('No groups selected - PEA selection cleared');
             }
         }
 
@@ -895,12 +1099,24 @@
             // Update chart description
             const kpiFilter = document.getElementById('kpiFilter').value;
             const description = document.getElementById('chartDescription');
+            const weightInfo = document.getElementById('weightInfo');
+            
             if (kpiFilter) {
                 description.textContent = `กำลังแสดงผลของ "${kpiFilter}"`;
                 description.classList.remove('hidden');
+                
+                // Show weight information for selected KPI (only once per KPI)
+                const firstItem = filteredData.find(item => item.kpi === kpiFilter);
+                if (firstItem && firstItem.weight) {
+                    weightInfo.textContent = `น้ำหนัก: ${firstItem.weight}`;
+                    weightInfo.classList.remove('hidden');
+                } else {
+                    weightInfo.classList.add('hidden');
+                }
             } else {
-                description.textContent = 'กำลังแสดงผลของ "ทุกหัวข้อ KPIs"';
+                description.textContent = 'ข้อ "ทุกหัวข้อ KPIs"';
                 description.classList.remove('hidden');
+                weightInfo.classList.add('hidden');
             }
 
             const labels = [...new Set(filteredData.map(item => item.pea))];
@@ -916,6 +1132,11 @@
                 const item = filteredData.find(d => d.pea === pea);
                 return item ? item.cumulativeTarget : 0;
             });
+
+            // Calculate dynamic Y-axis max (add 20% buffer)
+            const allValues = [...performanceData, ...yearlyTargetData, ...cumulativeTargetData];
+            const maxValue = Math.max(...allValues);
+            let yAxisMax = Math.ceil(maxValue * 1.2); // Add 20% buffer
 
             // Highlight กฟส.นพ.
             const highlightColors = labels.map(label => 
@@ -997,37 +1218,38 @@
                             }
                         },
                         datalabels: {
-                            display: true, // Show on all datasets
+                            display: true,
+                            align: function(context) {
+                                if (context.datasetIndex === 0) return 'top'; // ผลดำเนินงาน - ด้านบน
+                                if (context.datasetIndex === 1) return 'bottom'; // เป้าหมายรายปี - ด้านล่าง
+                                return 'right'; // เป้าสะสม - ด้านข้าง
+                            },
+                            anchor: function(context) {
+                                if (context.datasetIndex === 0) return 'end'; // ผลดำเนินงาน
+                                if (context.datasetIndex === 1) return 'start'; // เป้าหมายรายปี
+                                return 'center'; // เป้าสะสม
+                            },
+                            offset: function(context) {
+                                if (context.datasetIndex === 2) return 10; // เป้าสะสม - เพิ่มระยะห่าง
+                                return 4;
+                            },
                             color: function(context) {
-                                if (context.datasetIndex === 0) {
-                                    const label = context.chart.data.labels[context.dataIndex];
-                                    return label.includes('กฟส.นพ.') ? '#92400E' : '#1E40AF';
-                                } else if (context.datasetIndex === 1) {
-                                    return '#15803D'; // Green for yearly target
-                                } else {
-                                    return '#DC2626'; // Red for cumulative target
+                                const label = context.chart.data.labels[context.dataIndex];
+                                const isHighlight = label && label.includes('กฟส.นพ.');
+                                
+                                if (context.datasetIndex === 0) { // ผลดำเนินงาน
+                                    return isHighlight ? '#92400E' : '#1F2937';
+                                } else if (context.datasetIndex === 1) { // เป้าหมายรายปี
+                                    return '#059669';
+                                } else { // เป้าสะสม
+                                    return '#DC2626';
                                 }
                             },
                             font: {
                                 size: 10,
                                 weight: 'bold'
                             },
-                            align: function(context) {
-                                if (context.datasetIndex === 0) return 'top';
-                                if (context.datasetIndex === 1) return 'bottom';
-                                return 'left';
-                            },
-                            anchor: function(context) {
-                                if (context.datasetIndex === 0) return 'end';
-                                if (context.datasetIndex === 1) return 'start';
-                                return 'center';
-                            },
-                            offset: function(context) {
-                                if (context.datasetIndex === 0) return 4;
-                                if (context.datasetIndex === 1) return 4;
-                                return 8;
-                            },
-                            formatter: function(value) {
+                            formatter: function(value, context) {
                                 return value.toLocaleString();
                             }
                         },
@@ -1044,6 +1266,15 @@
                             borderColor: 'rgba(255, 255, 255, 0.2)',
                             borderWidth: 1,
                             callbacks: {
+                                title: function(context) {
+                                    const pea = context[0].label;
+                                    const item = filteredData.find(d => d.pea === pea);
+                                    let title = pea;
+                                    if (item && item.weight) {
+                                        title += ` (น้ำหนัก: ${item.weight})`;
+                                    }
+                                    return title;
+                                },
                                 label: function(context) {
                                     let label = context.dataset.label || '';
                                     if (label) {
@@ -1052,9 +1283,10 @@
                                     if (context.parsed.y !== null) {
                                         label += parseFloat(context.parsed.y).toLocaleString();
                                         // Add unit if available
-                                        const unit = filteredData.length > 0 ? filteredData[0].unit : '';
-                                        if (unit) {
-                                            label += ' ' + unit;
+                                        const pea = context.label;
+                                        const item = filteredData.find(d => d.pea === pea);
+                                        if (item && item.unit) {
+                                            label += ' ' + item.unit;
                                         }
                                     }
                                     return label;
@@ -1065,6 +1297,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            max: yAxisMax,
                             title: {
                                 display: true,
                                 text: filteredData.length > 0 ? filteredData[0].unit : 'หน่วย'
@@ -1086,9 +1319,48 @@
             });
         }
 
+        let currentSort = { column: 'performance', direction: 'desc' };
+        
         function updateRankingTable() {
             const tbody = document.getElementById('rankingTableBody');
-            const sortedData = [...filteredData].sort((a, b) => b.performance - a.performance);
+            const kpiTitle = document.getElementById('rankingKpiTitle');
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            
+            // Update KPI title
+            if (kpiFilter) {
+                kpiTitle.textContent = `หัวข้อ KPIs: ${kpiFilter}`;
+            } else {
+                kpiTitle.textContent = 'หัวข้อ KPIs: ทั้งหมด';
+            }
+            
+            // Sort data based on current sort settings
+            let sortedData = [...filteredData];
+            switch (currentSort.column) {
+                case 'rank':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.performance - b.performance : b.performance - a.performance);
+                    break;
+                case 'pea':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.pea.localeCompare(b.pea) : b.pea.localeCompare(a.pea));
+                    break;
+                case 'performance':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.performance - b.performance : b.performance - a.performance);
+                    break;
+                case 'percentage':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.percentage - b.percentage : b.percentage - a.percentage);
+                    break;
+                case 'weight':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.weight - b.weight : b.weight - a.weight);
+                    break;
+                case 'kpiScore':
+                    sortedData.sort((a, b) => currentSort.direction === 'asc' ? 
+                        a.kpiScore - b.kpiScore : b.kpiScore - a.kpiScore);
+                    break;
+            }
             
             tbody.innerHTML = '';
             sortedData.forEach((item, index) => {
@@ -1104,12 +1376,38 @@
                 row.innerHTML = `
                     <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${index + 1}</td>
                     <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.pea}</td>
-                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toLocaleString()}</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
                     <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.percentage.toFixed(1)}%</td>
-                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(1)}</td>
+                    <td class="px-3 py-2 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(2)}</td>
                 `;
                 tbody.appendChild(row);
             });
+            
+            // Update sort indicators
+            updateSortIndicators();
+        }
+        
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'desc';
+            }
+            updateRankingTable();
+        }
+        
+        function updateSortIndicators() {
+            // Reset all indicators
+            ['sortRank', 'sortPea', 'sortPerformance', 'sortPercentage', 'sortKpiScore'].forEach(id => {
+                document.getElementById(id).textContent = '↕️';
+            });
+            
+            // Set active indicator
+            const activeIndicator = document.getElementById(`sort${currentSort.column.charAt(0).toUpperCase() + currentSort.column.slice(1)}`);
+            if (activeIndicator) {
+                activeIndicator.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+            }
         }
 
         function updateSummaryTable() {
@@ -1147,16 +1445,73 @@
 
             tbody.innerHTML = '';
             
-            // Sort by exact original order in sheet (maintain the order from rawData)
-            const peaOrder = [...new Set(rawData.map(item => item.pea))];
-            const filteredPEAOrder = peaOrder.filter(pea => uniquePEAsInData.includes(pea));
+            // Define exact PEA order as specified
+            const exactPEAOrder = [
+                'กฟส.อด.',
+                'กฟส.บผอ.',
+                'กฟส.นวซ.',
+                'กฟส.กจบ.',
+                'รวม กฟส.อด.',
+                'กฟส.นค.',
+                'กฟส.ทบ.',
+                'กฟส.พส.',
+                'รวม กฟส.นค.',
+                'กฟส.ขก.',
+                'กฟส.นพง.',
+                'กฟส.กน.',
+                'รวม กฟส.ขก.',
+                'กฟส.ลย.',
+                'กฟส.ชคน.',
+                'กฟส.ดซ.',
+                'รวม กฟส.ลย.',
+                'กฟส.สน.',
+                'กฟส.ออ.',
+                'กฟส.พณ.',
+                'รวม กฟส.สน.',
+                'กฟส.นพ.',
+                'กฟส.ธพ.',
+                'กฟส.นก.',
+                'กฟส.บพง.',
+                'รวม กฟส.นพ.',
+                'กฟส.ชมพ.',
+                'กฟส.ภว.',
+                'กฟส.นรอ.',
+                'รวม กฟส.ชมพ.',
+                'กฟส.กภว.',
+                'รวม กฟส.กภว.',
+                'กฟส.นห.',
+                'กฟส.บดง.',
+                'รวม กฟส.นห.',
+                'กฟส.พคน.',
+                'กฟส.วว.',
+                'รวม กฟส.พคน.',
+                'กฟส.นภ.',
+                'กฟส.ศบร.',
+                'กฟส.นกล.',
+                'รวม กฟส.นภ.',
+                'กฟส.บผ.',
+                'กฟส.พล.',
+                'กฟส.มจ.',
+                'กฟส.นสห.',
+                'รวม กฟส.บผ.',
+                'กฟส.บฬ.',
+                'กฟส.ซก.',
+                'รวม กฟส.บฬ.',
+                'กฟส.ขก.2',
+                'กฟส.บฝ.',
+                'รวม กฟส.ขก.2',
+                'กฟส.อด.2',
+                'กฟส.เพ็ญ',
+                'รวม กฟส.อด.2',
+                'กฟส.สดด.',
+                'รวม กฟส.สดด.',
+                'กฟส.วสพ.',
+                'รวม กฟส.วสพ.',
+                'รวม กฟฉ.1'
+            ];
             
-            // Maintain exact sheet order without any special prioritization
-            filteredPEAOrder.sort((a, b) => {
-                const indexA = peaOrder.indexOf(a);
-                const indexB = peaOrder.indexOf(b);
-                return indexA - indexB;
-            });
+            // Filter to only include PEAs that exist in the data and sort by exact order
+            let filteredPEAOrder = exactPEAOrder.filter(pea => uniquePEAsInData.includes(pea));
             
             filteredPEAOrder.forEach((pea, index) => {
                 const stats = peaGroups[pea];
@@ -1181,10 +1536,19 @@
                     <td class="px-4 py-3 ${yellowClass} font-medium cursor-pointer hover:bg-yellow-100 rounded" 
                         onclick="showKPIDetails('${pea}', 'pending', '❓ รอผล')">${stats.pending.length}</td>
                     <td class="px-4 py-3 font-semibold ${highlightClass}">${stats.total}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="downloadPEAImage('${pea}')" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                            📷 ภาพ
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
+
         }
+
+
 
         function updateNotes() {
             const notesContent = document.getElementById('notesContent');
@@ -1199,6 +1563,223 @@
             } else {
                 notesContent.textContent = 'ไม่มีหมายเหตุ';
             }
+        }
+
+        let currentSelectedPEA = '';
+        
+        function downloadPEAImage(pea) {
+            currentSelectedPEA = pea;
+            document.getElementById('peaImageTypeModal').classList.remove('hidden');
+        }
+        
+        function closePEAImageTypeModal() {
+            document.getElementById('peaImageTypeModal').classList.add('hidden');
+            currentSelectedPEA = '';
+        }
+        
+        function downloadPEAImageByType(type) {
+            const pea = currentSelectedPEA;
+            
+            // Get ALL data for this PEA (ignore all filters - show complete data)
+            const peaData = rawData.filter(item => item.pea === pea);
+            
+            // Filter data by type
+            let filteredPeaData = [];
+            let typeTitle = '';
+            let typeColor = '';
+            
+            switch (type) {
+                case 'pass':
+                    filteredPeaData = peaData.filter(item => item.kpiScore >= 5);
+                    typeTitle = '⭐ ผ่าน 5 คะแนน';
+                    typeColor = '#059669';
+                    break;
+                case 'fail':
+                    filteredPeaData = peaData.filter(item => item.kpiScore > 0 && item.kpiScore < 5);
+                    typeTitle = '❌ ไม่ผ่าน 5 คะแนน';
+                    typeColor = '#DC2626';
+                    break;
+                case 'pending':
+                    filteredPeaData = peaData.filter(item => item.kpiScore === 0);
+                    typeTitle = '❓ รอผล';
+                    typeColor = '#D97706';
+                    break;
+            }
+            
+            // Create canvas for table-like image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate canvas dimensions
+            const headerHeight = 120;
+            const tableHeaderHeight = 50;
+            const rowHeight = 60;
+            const padding = 20;
+            
+            canvas.width = 1600;
+            canvas.height = headerHeight + tableHeaderHeight + (filteredPeaData.length * rowHeight) + 100;
+            
+            // Fill background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 28px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`📋 ${typeTitle}`, canvas.width / 2, 40);
+            
+            // Draw PEA name
+            ctx.fillStyle = '#4B5563';
+            ctx.font = 'bold 22px Arial, sans-serif';
+            ctx.fillText(pea, canvas.width / 2, 75);
+            
+            // Draw KPI title
+            ctx.fillStyle = '#6B7280';
+            ctx.font = '18px Arial, sans-serif';
+            ctx.fillText(`หัวข้อ: ทุกหัวข้อ KPIs`, canvas.width / 2, 105);
+            
+            let y = headerHeight + padding;
+            
+            if (filteredPeaData.length > 0) {
+                // Draw table headers
+                const colWidths = [60, 1000, 200, 150, 100];
+                const headers = ['ลำดับ', 'หัวข้อ KPIs', 'ผลดำเนินงาน', 'คิดเป็น(%)', 'คะแนน KPIs'];
+                
+                // Header background
+                ctx.fillStyle = '#F3F4F6';
+                ctx.fillRect(padding, y, canvas.width - (2 * padding), tableHeaderHeight);
+                
+                // Header text
+                ctx.fillStyle = '#374151';
+                ctx.font = 'bold 18px Arial, sans-serif';
+                ctx.textAlign = 'left';
+                
+                let x = padding + 20;
+                headers.forEach((header, i) => {
+                    if (i === 0) {
+                        ctx.textAlign = 'center';
+                        ctx.fillText(header, x + colWidths[i] / 2, y + 32);
+                    } else {
+                        ctx.textAlign = 'left';
+                        ctx.fillText(header, x + 10, y + 32);
+                    }
+                    x += colWidths[i];
+                });
+                
+                y += tableHeaderHeight;
+                
+                // Draw data rows
+                ctx.font = '16px Arial, sans-serif';
+                filteredPeaData.forEach((item, index) => {
+                    // Row background
+                    if (index % 2 === 0) {
+                        ctx.fillStyle = '#F9FAFB';
+                        ctx.fillRect(padding, y, canvas.width - (2 * padding), rowHeight);
+                    }
+                    
+                    // Row data
+                    x = padding + 20;
+                    const cellData = [
+                        (index + 1).toString(),
+                        item.kpi,
+                        item.performance.toLocaleString(),
+                        item.percentage.toFixed(1) + '%',
+                        item.kpiScore.toFixed(2)
+                    ];
+                    
+                    cellData.forEach((cellText, i) => {
+                        ctx.fillStyle = '#374151';
+                        
+                        if (i === 0) {
+                            ctx.textAlign = 'center';
+                            ctx.fillText(cellText, x + colWidths[i] / 2, y + 25);
+                        } else {
+                            ctx.textAlign = 'left';
+                            // Handle long text for KPI column
+                            if (i === 1) {
+                                const maxCharsPerLine = 60;
+                                const words = cellText.split(' ');
+                                let lines = [];
+                                let currentLine = '';
+                                
+                                words.forEach(word => {
+                                    if ((currentLine + word).length <= maxCharsPerLine) {
+                                        currentLine += (currentLine ? ' ' : '') + word;
+                                    } else {
+                                        if (currentLine) lines.push(currentLine);
+                                        currentLine = word;
+                                    }
+                                });
+                                if (currentLine) lines.push(currentLine);
+                                
+                                // Limit to 3 lines
+                                if (lines.length > 3) {
+                                    lines = lines.slice(0, 3);
+                                    lines[2] = lines[2].substring(0, maxCharsPerLine - 3) + '...';
+                                }
+                                
+                                lines.forEach((line, lineIndex) => {
+                                    ctx.fillText(line, x + 10, y + 20 + (lineIndex * 16));
+                                });
+                            } else {
+                                ctx.fillText(cellText, x + 10, y + 25);
+                            }
+                        }
+                        x += colWidths[i];
+                    });
+                    
+                    y += rowHeight;
+                });
+                
+                // Draw table borders
+                ctx.strokeStyle = '#D1D5DB';
+                ctx.lineWidth = 1;
+                
+                // Vertical lines
+                x = padding + 20;
+                colWidths.forEach((width, i) => {
+                    if (i < colWidths.length - 1) {
+                        x += width;
+                        ctx.beginPath();
+                        ctx.moveTo(x, headerHeight + padding);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                });
+                
+                // Outer border
+                ctx.strokeStyle = '#6B7280';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(padding, headerHeight + padding, canvas.width - (2 * padding), y - headerHeight - padding);
+                
+            } else {
+                // No data message
+                ctx.fillStyle = typeColor;
+                ctx.font = 'bold 24px Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('ไม่มีข้อมูล', canvas.width / 2, y + 50);
+                y += 100;
+            }
+            
+            // Draw footer
+            ctx.fillStyle = '#6B7280';
+            ctx.font = '14px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`สร้างเมื่อ: ${new Date().toLocaleString('th-TH')}`, canvas.width / 2, y + 40);
+            
+            // Download
+            const link = document.createElement('a');
+            const safePeaName = pea.replace(/[/\\?%*:|"<>]/g, '_');
+            const safeTypeName = typeTitle.replace(/[/\\?%*:|"<>⭐❌❓]/g, '').trim();
+            const timestamp = new Date().toLocaleDateString('th-TH').replace(/\//g, '-');
+            
+            link.download = `${safeTypeName}_${safePeaName}_ทุกหัวข้อKPIs_${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+            
+            closePEAImageTypeModal();
+            showNotification(`ดาวน์โหลดภาพสำเร็จ: ${typeTitle} - ${pea}`, 'success');
         }
 
         function toggleSummaryTable() {
@@ -1257,7 +1838,7 @@
                     <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.pea}</td>
                     <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toLocaleString()}</td>
                     <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.percentage.toFixed(1)}%</td>
-                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(1)}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(2)}</td>
                 `;
                 modalTableBody.appendChild(row);
             });
@@ -1378,9 +1959,9 @@
             const fullscreenDescription = document.getElementById('fullscreenChartDescription');
             
             if (kpiFilter) {
-                fullscreenDescription.textContent = `กำลังแสดงผลของ "${kpiFilter}"`;
+                fullscreenDescription.textContent = `ข้อ "${kpiFilter}"`;
             } else {
-                fullscreenDescription.textContent = 'กำลังแสดงผลของ "ทุกหัวข้อ KPIs"';
+                fullscreenDescription.textContent = 'ข้อ "ทุกหัวข้อ KPIs"';
             }
             
             // Copy chart data and configuration
@@ -1476,13 +2057,29 @@
                             },
                             datalabels: {
                                 display: true,
+                                align: function(context) {
+                                    if (context.datasetIndex === 0) return 'top'; // ผลดำเนินงาน - ด้านบน
+                                    if (context.datasetIndex === 1) return 'bottom'; // เป้าหมายรายปี - ด้านล่าง
+                                    return 'right'; // เป้าสะสม - ด้านข้าง
+                                },
+                                anchor: function(context) {
+                                    if (context.datasetIndex === 0) return 'end'; // ผลดำเนินงาน
+                                    if (context.datasetIndex === 1) return 'start'; // เป้าหมายรายปี
+                                    return 'center'; // เป้าสะสม
+                                },
+                                offset: function(context) {
+                                    if (context.datasetIndex === 2) return 12; // เป้าสะสม - เพิ่มระยะห่าง
+                                    return 6;
+                                },
                                 color: function(context) {
-                                    if (context.datasetIndex === 0) {
-                                        const label = context.chart.data.labels[context.dataIndex];
-                                        return label.includes('กฟส.นพ.') ? '#92400E' : '#1E40AF';
-                                    } else if (context.datasetIndex === 1) {
-                                        return '#15803D';
-                                    } else {
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    const isHighlight = label && label.includes('กฟส.นพ.');
+                                    
+                                    if (context.datasetIndex === 0) { // ผลดำเนินงาน
+                                        return isHighlight ? '#92400E' : '#1F2937';
+                                    } else if (context.datasetIndex === 1) { // เป้าหมายรายปี
+                                        return '#059669';
+                                    } else { // เป้าสะสม
                                         return '#DC2626';
                                     }
                                 },
@@ -1490,12 +2087,7 @@
                                     size: 12,
                                     weight: 'bold'
                                 },
-                                align: function(context) {
-                                    return context.datasetIndex === 0 ? 'top' : 'bottom';
-                                },
-                                anchor: 'end',
-                                offset: 6,
-                                formatter: function(value) {
+                                formatter: function(value, context) {
                                     return value.toLocaleString();
                                 }
                             },
@@ -1518,6 +2110,15 @@
                                     size: 14
                                 },
                                 callbacks: {
+                                    title: function(context) {
+                                        const pea = context[0].label;
+                                        const item = filteredData.find(d => d.pea === pea);
+                                        let title = pea;
+                                        if (item && item.weight) {
+                                            title += ` (น้ำหนัก: ${item.weight})`;
+                                        }
+                                        return title;
+                                    },
                                     label: function(context) {
                                         let label = context.dataset.label || '';
                                         if (label) {
@@ -1586,9 +2187,58 @@
         function downloadChart() {
             const canvas = chart ? document.getElementById('lineChart') : null;
             if (canvas) {
+                const kpiFilter = document.getElementById('kpiFilter').value;
+                const kpiName = kpiFilter || 'ทุกหัวข้อ KPIs';
+                const safeKpiName = kpiName.replace(/[/\\?%*:|"<>]/g, '_');
+                const timestamp = new Date().toLocaleDateString('th-TH').replace(/\//g, '-');
+                
+                // Create a new canvas with title
+                const newCanvas = document.createElement('canvas');
+                const newCtx = newCanvas.getContext('2d');
+                
+                // Set canvas size (add space for title and weight info)
+                const hasWeight = kpiFilter && filteredData.length > 0 && 
+                                filteredData.find(item => item.kpi === kpiFilter && item.weight);
+                const extraHeight = hasWeight ? 120 : 80;
+                
+                newCanvas.width = canvas.width;
+                newCanvas.height = canvas.height + extraHeight;
+                
+                // Fill background
+                newCtx.fillStyle = 'white';
+                newCtx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                
+                // Draw title
+                newCtx.fillStyle = '#1F2937';
+                newCtx.font = 'bold 24px Arial, sans-serif';
+                newCtx.textAlign = 'center';
+                newCtx.fillText('📈 กราฟแสดงผลการดำเนินงาน', newCanvas.width / 2, 35);
+                
+                // Draw KPI title
+                newCtx.fillStyle = '#4B5563';
+                newCtx.font = '18px Arial, sans-serif';
+                newCtx.fillText(`หัวข้อ KPIs: ${kpiName}`, newCanvas.width / 2, 65);
+                
+                // Draw weight information if available
+                if (kpiFilter && filteredData.length > 0) {
+                    const firstItem = filteredData.find(item => item.kpi === kpiFilter);
+                    if (firstItem && firstItem.weight) {
+                        newCtx.fillStyle = '#2563EB';
+                        newCtx.font = 'bold 16px Arial, sans-serif';
+                        newCtx.fillText(`น้ำหนัก: ${firstItem.weight}`, newCanvas.width / 2, 85);
+                        
+                        // Adjust chart position to accommodate weight info
+                        newCtx.drawImage(canvas, 0, 100);
+                    } else {
+                        newCtx.drawImage(canvas, 0, 80);
+                    }
+                } else {
+                    newCtx.drawImage(canvas, 0, 80);
+                }
+                
                 const link = document.createElement('a');
-                link.download = 'กราฟแสดงผลการดำเนินงาน.png';
-                link.href = canvas.toDataURL();
+                link.download = `กราฟ_${safeKpiName}_${timestamp}.png`;
+                link.href = newCanvas.toDataURL();
                 link.click();
             }
         }
@@ -1597,10 +2247,40 @@
         function expandTable() {
             const modal = document.getElementById('tableModal');
             const fullscreenTableBody = document.getElementById('fullscreenTableBody');
-            const originalTableBody = document.getElementById('rankingTableBody');
+            const fullscreenKpiTitle = document.getElementById('fullscreenRankingKpiTitle');
+            const kpiFilter = document.getElementById('kpiFilter').value;
             
-            // Copy table content
-            fullscreenTableBody.innerHTML = originalTableBody.innerHTML;
+            // Update KPI title in fullscreen
+            if (kpiFilter) {
+                fullscreenKpiTitle.textContent = `หัวข้อ KPIs: ${kpiFilter}`;
+            } else {
+                fullscreenKpiTitle.textContent = 'หัวข้อ KPIs: ทั้งหมด';
+            }
+            
+            // Recreate table content without weight column
+            const sortedData = [...filteredData].sort((a, b) => b.performance - a.performance);
+            
+            fullscreenTableBody.innerHTML = '';
+            sortedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const isHighlight = item.pea.includes('กฟส.นพ.');
+                
+                if (isHighlight) {
+                    row.className = 'bg-yellow-100 border-l-4 border-yellow-500 font-medium';
+                } else {
+                    row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                }
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${index + 1}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800 font-semibold' : ''}">${item.pea}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.performance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.percentage.toFixed(1)}%</td>
+                    <td class="px-4 py-3 ${isHighlight ? 'text-yellow-800' : ''}">${item.kpiScore.toFixed(2)}</td>
+                `;
+                fullscreenTableBody.appendChild(row);
+            });
+            
             modal.classList.remove('hidden');
         }
         
@@ -1624,7 +2304,7 @@
             const canvasHeight = titleHeight + headerHeight + (sortedData.length * rowHeight) + padding;
             
             // Set canvas size
-            canvas.width = 1200;
+            canvas.width = 1500;
             canvas.height = Math.max(canvasHeight, 400);
             
             // Fill background
@@ -1635,28 +2315,80 @@
             ctx.fillStyle = '#1F2937';
             ctx.font = 'bold 28px Arial, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🏆 ผลการดำเนินงาน', canvas.width / 2, 40);
+            ctx.fillText('🏆 อันดับผลการดำเนินงาน', canvas.width / 2, 40);
             
-            // Draw table headers background
+            // Draw KPI title with text wrapping
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const kpiName = kpiFilter || 'ทุกหัวข้อ KPIs';
+            ctx.fillStyle = '#4B5563';
+            ctx.font = '20px Arial, sans-serif';
+            
+            // Handle long KPI titles by wrapping text
+            const kpiText = `หัวข้อ KPIs: ${kpiName}`;
+            const maxKpiWidth = canvas.width - 100;
+            const kpiMetrics = ctx.measureText(kpiText);
+            
+            if (kpiMetrics.width > maxKpiWidth) {
+                // Split into multiple lines if too long
+                const words = kpiText.split(' ');
+                let lines = [];
+                let currentLine = '';
+                
+                words.forEach(word => {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const testMetrics = ctx.measureText(testLine);
+                    
+                    if (testMetrics.width > maxKpiWidth && currentLine !== '') {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                if (currentLine) lines.push(currentLine);
+                
+                // Draw each line
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, canvas.width / 2, 70 + (index * 25));
+                });
+            } else {
+                ctx.fillText(kpiText, canvas.width / 2, 70);
+            }
+            
+            // Calculate adjusted title height based on KPI text lines
+            const kpiLines = kpiMetrics.width > maxKpiWidth ? 
+                Math.ceil(kpiText.split(' ').reduce((acc, word) => {
+                    const testLine = acc.currentLine + (acc.currentLine ? ' ' : '') + word;
+                    const testMetrics = ctx.measureText(testLine);
+                    if (testMetrics.width > maxKpiWidth && acc.currentLine !== '') {
+                        acc.lines++;
+                        acc.currentLine = word;
+                    } else {
+                        acc.currentLine = testLine;
+                    }
+                    return acc;
+                }, { lines: 1, currentLine: '' }).lines) : 1;
+            
+            const adjustedTitleHeight = titleHeight + 30 + ((kpiLines - 1) * 25); // Add space for KPI title lines
             ctx.fillStyle = '#F3F4F6';
-            ctx.fillRect(20, titleHeight, canvas.width - 40, 40);
+            ctx.fillRect(20, adjustedTitleHeight, canvas.width - 40, 40);
             
             // Draw table headers
             ctx.fillStyle = '#374151';
             ctx.font = 'bold 18px Arial, sans-serif';
             ctx.textAlign = 'left';
-            const headers = ['🏆อันดับ', 'PEA', 'ผลดำเนินงาน', 'คิดเป็น%', 'คะแนน KPIs'];
-            const colWidths = [100, 300, 200, 150, 150];
+            const headers = ['🏆อันดับ', 'PEA', 'ผลดำเนินงาน', 'คิดเป็น%', 'น้ำหนัก', 'คะแนน KPIs'];
+            const colWidths = [100, 400, 200, 150, 150, 100];
             let x = 40;
             
             headers.forEach((header, i) => {
-                ctx.fillText(header, x, titleHeight + 28);
+                ctx.fillText(header, x, adjustedTitleHeight + 28);
                 x += colWidths[i];
             });
             
             // Draw table data
             ctx.font = '16px Arial, sans-serif';
-            let y = titleHeight + 60;
+            let y = adjustedTitleHeight + 60;
             
             sortedData.forEach((item, rowIndex) => {
                 const isHighlight = item.pea.includes('กฟส.นพ.');
@@ -1677,6 +2409,7 @@
                     item.pea,
                     item.performance.toLocaleString(),
                     item.percentage.toFixed(1) + '%',
+                    item.weight.toFixed(1) + '%',
                     item.kpiScore.toFixed(1)
                 ];
                 
@@ -1724,8 +2457,8 @@
             
             // Header border
             ctx.beginPath();
-            ctx.moveTo(20, titleHeight + 40);
-            ctx.lineTo(canvas.width - 20, titleHeight + 40);
+            ctx.moveTo(20, adjustedTitleHeight + 40);
+            ctx.lineTo(canvas.width - 20, adjustedTitleHeight + 40);
             ctx.stroke();
             
             // Vertical lines
@@ -1734,7 +2467,7 @@
                 if (i < colWidths.length - 1) {
                     x += width;
                     ctx.beginPath();
-                    ctx.moveTo(x, titleHeight);
+                    ctx.moveTo(x, adjustedTitleHeight);
                     ctx.lineTo(x, y - rowHeight + 5);
                     ctx.stroke();
                 }
@@ -1743,7 +2476,7 @@
             // Outer border
             ctx.strokeStyle = '#6B7280';
             ctx.lineWidth = 2;
-            ctx.strokeRect(20, titleHeight, canvas.width - 40, y - titleHeight - rowHeight + 5);
+            ctx.strokeRect(20, adjustedTitleHeight, canvas.width - 40, y - adjustedTitleHeight - rowHeight + 5);
             
             // Add footer
             ctx.fillStyle = '#6B7280';
@@ -1753,7 +2486,7 @@
             
             // Download
             const link = document.createElement('a');
-            link.download = `ผลการดำเนินงาน_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.png`;
+            link.download = `อันดับผลการดำเนินงาน_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.png`;
             link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }
@@ -1766,7 +2499,7 @@
             const progress = document.getElementById('loadingProgress');
             
             title.textContent = message;
-            messageEl.textContent = 'ระบบกำลังดึงข้อมูลจาก DATA BASE';
+            messageEl.textContent = 'กรุณารอสักครู่ ระบบกำลังดึงข้อมูลจาก DATABASE';
             progress.style.width = '0%';
             
             indicator.classList.remove('hidden');
@@ -1824,6 +2557,512 @@
         function hideNotification() {
             document.getElementById('notificationToast').classList.add('hidden');
         }
+        
+        function downloadSummaryReport() {
+            // Get current filter settings
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const kpiTitle = kpiFilter || 'ทุกหัวข้อ KPIs';
+            
+            // Apply filters to determine which data to show in summary
+            const dataToSummarize = rawData.filter(item => {
+                const kpiMatch = !kpiFilter || item.kpi === kpiFilter;
+                const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(item.group);
+                const peaMatch = selectedPEAs.length === 0 || selectedPEAs.includes(item.pea);
+                
+                return kpiMatch && groupMatch && peaMatch;
+            });
+            
+            // Get unique PEAs from filtered data
+            const uniquePEAsInData = [...new Set(dataToSummarize.map(item => item.pea))];
+            
+            // Group data by PEA
+            const peaGroups = {};
+            dataToSummarize.forEach(item => {
+                if (!peaGroups[item.pea]) {
+                    peaGroups[item.pea] = { pass: [], fail: [], pending: [], total: 0 };
+                }
+                
+                peaGroups[item.pea].total++;
+                if (item.kpiScore >= 5) {
+                    peaGroups[item.pea].pass.push(item);
+                } else if (item.kpiScore > 0) {
+                    peaGroups[item.pea].fail.push(item);
+                } else {
+                    peaGroups[item.pea].pending.push(item);
+                }
+            });
+            
+            // Sort by exact original order in sheet
+            const peaOrder = [...new Set(rawData.map(item => item.pea))];
+            const filteredPEAOrder = peaOrder.filter(pea => uniquePEAsInData.includes(pea));
+            filteredPEAOrder.sort((a, b) => {
+                const indexA = peaOrder.indexOf(a);
+                const indexB = peaOrder.indexOf(b);
+                return indexA - indexB;
+            });
+            
+            // Create detailed report content
+            let reportContent = `รายงานสรุปคะแนน KPIs\n`;
+            reportContent += `หัวข้อ: ${kpiTitle}\n`;
+            reportContent += `วันที่สร้างรายงาน: ${new Date().toLocaleString('th-TH')}\n`;
+            reportContent += `จำนวน PEA ที่แสดง: ${filteredPEAOrder.length} แห่ง\n\n`;
+            
+            reportContent += `สรุปภาพรวม:\n`;
+            reportContent += `${'='.repeat(50)}\n`;
+            
+            filteredPEAOrder.forEach((pea, index) => {
+                const stats = peaGroups[pea];
+                if (!stats) return;
+                
+                reportContent += `\n${index + 1}. ${pea}\n`;
+                reportContent += `   ⭐ ผ่าน 5 คะแนน: ${stats.pass.length} ข้อ\n`;
+                reportContent += `   ❌ ไม่ผ่าน 5 คะแนน: ${stats.fail.length} ข้อ\n`;
+                reportContent += `   ❓ รอผล: ${stats.pending.length} ข้อ\n`;
+                reportContent += `   รวมทั้งหมด: ${stats.total} ข้อ\n`;
+            });
+            
+            // Add detailed breakdown
+            reportContent += `\n\nรายละเอียดแต่ละ PEA:\n`;
+            reportContent += `${'='.repeat(50)}\n`;
+            
+            filteredPEAOrder.forEach((pea, index) => {
+                const stats = peaGroups[pea];
+                if (!stats) return;
+                
+                reportContent += `\n${index + 1}. ${pea}\n`;
+                reportContent += `${'-'.repeat(30)}\n`;
+                
+                if (stats.pass.length > 0) {
+                    reportContent += `\n⭐ ผ่าน 5 คะแนน (${stats.pass.length} ข้อ):\n`;
+                    stats.pass.forEach((item, i) => {
+                        reportContent += `   ${i + 1}. ${item.kpi} - คะแนน: ${item.kpiScore.toFixed(2)}\n`;
+                    });
+                }
+                
+                if (stats.fail.length > 0) {
+                    reportContent += `\n❌ ไม่ผ่าน 5 คะแนน (${stats.fail.length} ข้อ):\n`;
+                    stats.fail.forEach((item, i) => {
+                        reportContent += `   ${i + 1}. ${item.kpi} - คะแนน: ${item.kpiScore.toFixed(2)}\n`;
+                    });
+                }
+                
+                if (stats.pending.length > 0) {
+                    reportContent += `\n❓ รอผล (${stats.pending.length} ข้อ):\n`;
+                    stats.pending.forEach((item, i) => {
+                        reportContent += `   ${i + 1}. ${item.kpi} - คะแนน: ${item.kpiScore.toFixed(2)}\n`;
+                    });
+                }
+                
+                reportContent += `\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            const safeKpiName = kpiTitle.replace(/[/\\?%*:|"<>]/g, '_');
+            const timestamp = new Date().toLocaleDateString('th-TH').replace(/\//g, '-');
+            
+            link.download = `รายงานสรุป_${safeKpiName}_${timestamp}.txt`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            
+            // Clean up
+            URL.revokeObjectURL(link.href);
+            
+            showNotification(`ดาวน์โหลดรายงานสรุปสำเร็จ: ${filteredPEAOrder.length} PEA`, 'success');
+        }
+
+        // PEA Selection Modal Functions
+        function showPEASelectionModal() {
+            const modal = document.getElementById('peaSelectionModal');
+            const peaList = document.getElementById('peaSelectionList');
+            
+            // Get current filtered PEAs
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const dataToSummarize = rawData.filter(item => {
+                const kpiMatch = !kpiFilter || item.kpi === kpiFilter;
+                const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(item.group);
+                const peaMatch = selectedPEAs.length === 0 || selectedPEAs.includes(item.pea);
+                return kpiMatch && groupMatch && peaMatch;
+            });
+            
+            const uniquePEAsInData = [...new Set(dataToSummarize.map(item => item.pea))];
+            const peaOrder = [...new Set(rawData.map(item => item.pea))];
+            const filteredPEAOrder = peaOrder.filter(pea => uniquePEAsInData.includes(pea));
+            filteredPEAOrder.sort((a, b) => {
+                const indexA = peaOrder.indexOf(a);
+                const indexB = peaOrder.indexOf(b);
+                return indexA - indexB;
+            });
+            
+            // Populate PEA list
+            peaList.innerHTML = '';
+            filteredPEAOrder.forEach(pea => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center p-2 hover:bg-gray-100 rounded';
+                div.innerHTML = `
+                    <label class="flex items-center cursor-pointer w-full">
+                        <input type="checkbox" value="${pea}" class="mr-3 pea-checkbox">
+                        <span class="font-medium">${pea}</span>
+                    </label>
+                `;
+                peaList.appendChild(div);
+            });
+            
+            // Reset select all checkbox
+            document.getElementById('selectAllPEAs').checked = false;
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closePEASelectionModal() {
+            document.getElementById('peaSelectionModal').classList.add('hidden');
+        }
+        
+        function toggleAllPEASelection() {
+            const selectAll = document.getElementById('selectAllPEAs');
+            const checkboxes = document.querySelectorAll('.pea-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function downloadSelectedPEAsImage() {
+            const selectedCheckboxes = document.querySelectorAll('.pea-checkbox:checked');
+            const selectedPEAsList = Array.from(selectedCheckboxes).map(cb => cb.value);
+            
+            if (selectedPEAsList.length === 0) {
+                showNotification('กรุณาเลือก PEA อย่างน้อย 1 แห่ง', 'warning');
+                return;
+            }
+            
+            generatePEASummaryImage(selectedPEAsList);
+            closePEASelectionModal();
+        }
+        
+        function generatePEASummaryImage(selectedPEAsList) {
+            const kpiFilter = document.getElementById('kpiFilter').value;
+            const kpiTitle = kpiFilter || 'ทุกหัวข้อ KPIs';
+            
+            // Get data for selected PEAs
+            const dataToSummarize = rawData.filter(item => {
+                const kpiMatch = !kpiFilter || item.kpi === kpiFilter;
+                const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(item.group);
+                const peaMatch = selectedPEAs.length === 0 || selectedPEAs.includes(item.pea);
+                return kpiMatch && groupMatch && peaMatch && selectedPEAsList.includes(item.pea);
+            });
+            
+            // Group data by PEA
+            const peaGroups = {};
+            dataToSummarize.forEach(item => {
+                if (!peaGroups[item.pea]) {
+                    peaGroups[item.pea] = { pass: [], fail: [], pending: [] };
+                }
+                
+                if (item.kpiScore >= 5) {
+                    peaGroups[item.pea].pass.push(item.kpi);
+                } else if (item.kpiScore > 0) {
+                    peaGroups[item.pea].fail.push(item.kpi);
+                } else {
+                    peaGroups[item.pea].pending.push(item.kpi);
+                }
+            });
+            
+            // Sort PEAs by original order
+            const peaOrder = [...new Set(rawData.map(item => item.pea))];
+            const sortedSelectedPEAs = selectedPEAsList.sort((a, b) => {
+                const indexA = peaOrder.indexOf(a);
+                const indexB = peaOrder.indexOf(b);
+                return indexA - indexB;
+            });
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate canvas dimensions
+            const headerHeight = 120;
+            const rowPadding = 20;
+            const minRowHeight = 80;
+            const maxItemsPerColumn = 15;
+            
+            // Calculate row heights based on content
+            let totalHeight = headerHeight;
+            const rowHeights = [];
+            
+            sortedSelectedPEAs.forEach(pea => {
+                const stats = peaGroups[pea];
+                if (!stats) return;
+                
+                // คำนวณความสูงที่ต้องการสำหรับแต่ละคอลัมน์ โดยพิจารณาข้อความยาว
+                const calculateColumnHeight = (items) => {
+                    let totalLines = 0;
+                    items.forEach(item => {
+                        if (item.length > 35) {
+                            const words = item.split(' ');
+                            let lines = [];
+                            let currentLine = '';
+                            
+                            words.forEach(word => {
+                                if ((currentLine + word).length <= 35) {
+                                    currentLine += (currentLine ? ' ' : '') + word;
+                                } else {
+                                    if (currentLine) lines.push(currentLine);
+                                    currentLine = word;
+                                }
+                            });
+                            if (currentLine) lines.push(currentLine);
+                            
+                            totalLines += Math.min(lines.length, 3); // จำกัดไม่เกิน 3 บรรทัด
+                        } else {
+                            totalLines += 1;
+                        }
+                    });
+                    return Math.ceil(totalLines / 2) * 20; // แบ่งเป็น 2 คอลัมน์
+                };
+                
+                const passHeight = calculateColumnHeight(stats.pass);
+                const failHeight = calculateColumnHeight(stats.fail);
+                const pendingHeight = calculateColumnHeight(stats.pending);
+                
+                const maxColumnHeight = Math.max(passHeight, failHeight, pendingHeight);
+                const rowHeight = Math.max(minRowHeight, maxColumnHeight + 40);
+                
+                rowHeights.push(rowHeight);
+                totalHeight += rowHeight + rowPadding;
+            });
+            
+            // Set canvas size
+            canvas.width = 1500;
+            canvas.height = Math.max(totalHeight + 50, 400);
+            
+            // Fill background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 32px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('📋 สรุปคะแนน KPIs', canvas.width / 2, 40);
+            
+            // Draw subtitle
+            ctx.fillStyle = '#4B5563';
+            ctx.font = '20px Arial, sans-serif';
+            ctx.fillText(`หัวข้อ: ${kpiTitle}`, canvas.width / 2, 75);
+            
+            // Draw date
+            ctx.fillStyle = '#6B7280';
+            ctx.font = '16px Arial, sans-serif';
+            ctx.fillText(`วันที่: ${new Date().toLocaleDateString('th-TH')}`, canvas.width / 2, 100);
+            
+            // Draw table headers
+            const colWidths = [60, 280, 360, 360, 340];
+            const colHeaders = ['ลำดับ', 'PEA', 'ข้อที่⭐ ผ่าน 5 คะแนน', 'ข้อที่❌ ไม่ผ่าน 5 คะแนน', '❓ รอผล'];
+            
+            let y = headerHeight + 20;
+            
+            // Draw header background
+            ctx.fillStyle = '#F3F4F6';
+            ctx.fillRect(20, y, canvas.width - 40, 50);
+            
+            // Draw header text
+            ctx.fillStyle = '#374151';
+            ctx.font = 'bold 18px Arial, sans-serif';
+            ctx.textAlign = 'left';
+            
+            let x = 40;
+            colHeaders.forEach((header, i) => {
+                if (i === 0) {
+                    ctx.textAlign = 'center';
+                    ctx.fillText(header, x + colWidths[i] / 2, y + 32);
+                } else {
+                    ctx.textAlign = 'left';
+                    ctx.fillText(header, x + 10, y + 32);
+                }
+                x += colWidths[i];
+            });
+            
+            y += 50;
+            
+            // Draw data rows
+            sortedSelectedPEAs.forEach((pea, index) => {
+                const stats = peaGroups[pea];
+                if (!stats) return;
+                
+                const rowHeight = rowHeights[index];
+                
+                // Draw row background
+                if (index % 2 === 0) {
+                    ctx.fillStyle = '#F9FAFB';
+                    ctx.fillRect(20, y, canvas.width - 40, rowHeight);
+                }
+                
+                // Draw row border
+                ctx.strokeStyle = '#E5E7EB';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(20, y, canvas.width - 40, rowHeight);
+                
+                // Draw cell content
+                x = 40;
+                
+                // Column 1: ลำดับ
+                ctx.fillStyle = '#374151';
+                ctx.font = 'bold 16px Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText((index + 1).toString(), x + colWidths[0] / 2, y + 30);
+                x += colWidths[0];
+                
+                // Column 2: PEA
+                ctx.textAlign = 'left';
+                ctx.font = 'bold 16px Arial, sans-serif';
+                const peaText = pea.length > 35 ? pea.substring(0, 35) + '...' : pea;
+                ctx.fillText(peaText, x + 10, y + 30);
+                x += colWidths[1];
+                
+                // Column 3: ผ่าน 5 คะแนน
+                ctx.fillStyle = '#059669';
+                ctx.font = '14px Arial, sans-serif';
+                drawItemList(ctx, stats.pass, x + 10, y + 25, colWidths[2] - 20, rowHeight - 30);
+                x += colWidths[2];
+                
+                // Column 4: ไม่ผ่าน 5 คะแนน
+                ctx.fillStyle = '#DC2626';
+                drawItemList(ctx, stats.fail, x + 10, y + 25, colWidths[3] - 20, rowHeight - 30);
+                x += colWidths[3];
+                
+                // Column 5: รอผล
+                ctx.fillStyle = '#D97706';
+                drawItemList(ctx, stats.pending, x + 10, y + 25, colWidths[4] - 20, rowHeight - 30);
+                
+                y += rowHeight + rowPadding;
+            });
+            
+            // Draw vertical lines
+            ctx.strokeStyle = '#D1D5DB';
+            ctx.lineWidth = 1;
+            x = 40;
+            colWidths.forEach((width, i) => {
+                if (i < colWidths.length - 1) {
+                    x += width;
+                    ctx.beginPath();
+                    ctx.moveTo(x, headerHeight + 20);
+                    ctx.lineTo(x, y - rowPadding);
+                    ctx.stroke();
+                }
+            });
+            
+            // Draw outer border
+            ctx.strokeStyle = '#6B7280';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, headerHeight + 20, canvas.width - 40, y - headerHeight - 20 - rowPadding);
+            
+            // Download
+            const link = document.createElement('a');
+            const safeKpiName = kpiTitle.replace(/[/\\?%*:|"<>]/g, '_');
+            const timestamp = new Date().toLocaleDateString('th-TH').replace(/\//g, '-');
+            link.download = `สรุปคะแนน_${safeKpiName}_${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+            
+            showNotification(`ดาวน์โหลดภาพสรุปสำเร็จ: ${selectedPEAsList.length} PEA`, 'success');
+        }
+        
+        function drawItemList(ctx, items, x, y, maxWidth, maxHeight) {
+            if (items.length === 0) {
+                ctx.fillText('-', x, y + 15);
+                return;
+            }
+            
+            const itemsPerColumn = Math.ceil(items.length / 2);
+            const columnWidth = maxWidth / 2;
+            const maxCharsPerLine = 35; // เพิ่มจำนวนตัวอักษรต่อบรรทัด
+            
+            // First column
+            let currentY = y;
+            for (let i = 0; i < Math.min(itemsPerColumn, items.length); i++) {
+                const item = items[i];
+                
+                // แบ่งข้อความเป็นหลายบรรทัดถ้าจำเป็น
+                if (item.length > maxCharsPerLine) {
+                    const words = item.split(' ');
+                    let lines = [];
+                    let currentLine = '';
+                    
+                    words.forEach(word => {
+                        if ((currentLine + word).length <= maxCharsPerLine) {
+                            currentLine += (currentLine ? ' ' : '') + word;
+                        } else {
+                            if (currentLine) lines.push(currentLine);
+                            currentLine = word;
+                        }
+                    });
+                    if (currentLine) lines.push(currentLine);
+                    
+                    // แสดงบรรทัดแรกพร้อม bullet point
+                    ctx.fillText(`• ${lines[0]}`, x, currentY + 15);
+                    
+                    // แสดงบรรทัดที่เหลือ (ไม่เกิน 3 บรรทัด)
+                    for (let lineIndex = 1; lineIndex < Math.min(lines.length, 3); lineIndex++) {
+                        ctx.fillText(`  ${lines[lineIndex]}`, x, currentY + 15 + (lineIndex * 16));
+                    }
+                    
+                    // เพิ่ม ... ถ้ามีข้อความเหลือ
+                    if (lines.length > 3) {
+                        ctx.fillText('  ...', x, currentY + 15 + (3 * 16));
+                    }
+                    
+                    currentY += Math.min(lines.length, 3) * 16 + 8;
+                } else {
+                    ctx.fillText(`• ${item}`, x, currentY + 15);
+                    currentY += 20;
+                }
+            }
+            
+            // Second column (if needed)
+            if (items.length > itemsPerColumn) {
+                currentY = y;
+                for (let i = itemsPerColumn; i < items.length; i++) {
+                    const item = items[i];
+                    
+                    // แบ่งข้อความเป็นหลายบรรทัดถ้าจำเป็น
+                    if (item.length > maxCharsPerLine) {
+                        const words = item.split(' ');
+                        let lines = [];
+                        let currentLine = '';
+                        
+                        words.forEach(word => {
+                            if ((currentLine + word).length <= maxCharsPerLine) {
+                                currentLine += (currentLine ? ' ' : '') + word;
+                            } else {
+                                if (currentLine) lines.push(currentLine);
+                                currentLine = word;
+                            }
+                        });
+                        if (currentLine) lines.push(currentLine);
+                        
+                        // แสดงบรรทัดแรกพร้อม bullet point
+                        ctx.fillText(`• ${lines[0]}`, x + columnWidth, currentY + 15);
+                        
+                        // แสดงบรรทัดที่เหลือ (ไม่เกิน 3 บรรทัด)
+                        for (let lineIndex = 1; lineIndex < Math.min(lines.length, 3); lineIndex++) {
+                            ctx.fillText(`  ${lines[lineIndex]}`, x + columnWidth, currentY + 15 + (lineIndex * 16));
+                        }
+                        
+                        // เพิ่ม ... ถ้ามีข้อความเหลือ
+                        if (lines.length > 3) {
+                            ctx.fillText('  ...', x + columnWidth, currentY + 15 + (3 * 16));
+                        }
+                        
+                        currentY += Math.min(lines.length, 3) * 16 + 8;
+                    } else {
+                        ctx.fillText(`• ${item}`, x + columnWidth, currentY + 15);
+                        currentY += 20;
+                    }
+                }
+            }
+        }
 
         // Close modal when clicking outside
         document.getElementById('kpiModal').addEventListener('click', function(e) {
@@ -1843,6 +3082,18 @@
                 closeTableModal();
             }
         });
+        
+        document.getElementById('peaSelectionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePEASelectionModal();
+            }
+        });
+        
+        document.getElementById('peaImageTypeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePEAImageTypeModal();
+            }
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98104fa48137893d',t:'MTc1ODE5MjkyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9878d108c001893d',t:'MTc1OTI4ODc0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
